@@ -1,0 +1,8 @@
+*.pyc
+__pycache__/
+*.db
+chat.txt
+_chat.txt
+*.zip
+.env
+
