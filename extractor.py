@@ -152,8 +152,9 @@ def extract_all_games(windows: list[GameWindow], verbose: bool = True) -> list[G
         if verbose:
             score_str = f"{game_result.score_brazuka}-{game_result.score_opponent}" \
                         if game_result.score_brazuka is not None else "?"
+            goals_str = [f"{g['player']} ({g['count']})" for g in game_result.goals]
             print(f"         → {game_result.result.upper()} {score_str} | "
-                  f"Goals: {[f\"{g['player']} ({g['count']})\" for g in game_result.goals]} | "
+                  f"Goals: {goals_str} | "
                   f"Confidence: {game_result.confidence}")
     return results
 
@@ -190,7 +191,8 @@ if __name__ == "__main__":
         print(f"\n{r.game_date} vs {r.opponent} ({r.home_or_away})")
         print(f"  Result: {r.result} | Score: {r.score_brazuka}-{r.score_opponent}")
         if r.goals:
-            print(f"  Goals: {', '.join(f\"{g['player']} x{g['count']}\" for g in r.goals)}")
+            goals_str = ', '.join(f"{g['player']} x{g['count']}" for g in r.goals)
+            print(f"  Goals: {goals_str}")
         if r.players_confirmed:
             print(f"  Players: {', '.join(r.players_confirmed)}")
         if r.notable_moments:
