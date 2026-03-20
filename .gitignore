@@ -5,4 +5,7 @@ chat.txt
 _chat.txt
 *.zip
 .env
+.env.local
+.DS_Store
+.claude/
 

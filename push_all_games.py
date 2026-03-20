@@ -5,7 +5,7 @@ from supabase import create_client
 from player_normalizer import PlayerNormalizer
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://lwfbvoewpzutowasyyoz.supabase.co")
-SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3ZmJ2b2V3cHp1dG93YXN5eW96Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzk1ODA0MCwiZXhwIjoyMDg5NTM0MDQwfQ.YJDp0wQYczXqfH1inJ3gIl3_4wqay8XzIdgKQKt8cU4")
+SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
 
 sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 norm = PlayerNormalizer()
