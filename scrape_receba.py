@@ -48,6 +48,7 @@ RECEBA_TEAM_ID_SUPABASE = 2  # teams.id for 'Receba FC'
 # Seasons with confirmed game data (0-game "Wrong" registrations excluded).
 # Season labels map to our standard short names stored in Supabase.
 RECEBA_SEASONS = [
+    ("185442", "Winter II 2023",  "2023-01-12"),  # earliest confirmed Thursday Redmond season
     ("188396", "Spring 2023",     "2023-04-13"),
     ("191108", "Summer 2023",     "2023-07-13"),
     ("193613", "Fall 2023",       "2023-08-31"),
