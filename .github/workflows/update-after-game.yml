@@ -1,9 +1,9 @@
 name: Post-Game Stats Update
 
 on:
-  # Runs every Wednesday at 9am Pacific (17:00 UTC) — after Tuesday night games
+  # Runs every Saturday at 9am Pacific (17:00 UTC) — gives a few days after Tuesday games
   schedule:
-    - cron: '0 17 * * 3'
+    - cron: '0 17 * * 6'
   # Also allows manual trigger from GitHub Actions tab
   workflow_dispatch:
 
