@@ -70,12 +70,18 @@ def clean_opponent(name: str) -> str:
     """Strip Arena Sports division/status suffixes from opponent names."""
     name = re.sub(r"\s+(?:NP(?:GK)?\s*\d*|N\dP)\s*$", "", name, flags=re.IGNORECASE).strip()
     # Remove Redmond/Issaquah/SODO venue+division suffixes: (RED) Thur Men's D1, (ISS) Thurs C2, etc.
+    # "(RED) Thur Men's D1" or "(Iss) Thur Mens D" — venue tag before division
     name = re.sub(
-        r"\s*\([A-Z]{2,4}\)\s+(?:Thurs?\.?\s+)?Men[s']?\s+[CD]\d*\s*(?:\([MS]\))?\s*(?:-\s*\S+)?\s*$",
+        r"\s*\([A-Za-z/]{2,7}\)\s+(?:Thurs?\.?\s+)?Men(?:s|'s)?\s+[CD]\d*\s*(?:\([MS]\))?\s*(?:-\s*\S+)?\s*$",
+        "", name, flags=re.IGNORECASE,
+    ).strip()
+    # "Thurs Men's C2 (RED)" — venue tag after division
+    name = re.sub(
+        r"\s+Thurs?\.?\s+Men(?:s|'s)?\s+[CD]\d*\s*\([A-Za-z/]{2,7}\)\s*$",
         "", name, flags=re.IGNORECASE,
     ).strip()
     name = re.sub(
-        r"\s*\([A-Z]{2,4}/[A-Z]{2,4}\)\s+(?:Thurs?\.?\s+)?Men[s']?\s+[CD]\d*\s*$",
+        r"\s*\([A-Z]{2,4}/[A-Z]{2,4}\)\s+(?:Thurs?\.?\s+)?Men(?:s|'s)?\s+[CD]\d*\s*$",
         "", name, flags=re.IGNORECASE,
     ).strip()
     # Remove Tuesday division suffixes for mixed-league games
