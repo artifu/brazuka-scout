@@ -268,24 +268,41 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
 }
 
 export async function getSeasonHistory(teamId: number) {
-  const { data: games } = await supabase
-    .from('games')
-    .select('result, score_brazuka, score_opponent, season_id, seasons!inner(name, start_date, league_position)')
-    .eq('team_id', teamId)
-    .not('result', 'is', null)
-    .limit(1000)
+  const [{ data: games }, { data: divGames }] = await Promise.all([
+    supabase
+      .from('games')
+      .select('result, score_brazuka, score_opponent, season_id, seasons!inner(name, start_date, league_position)')
+      .eq('team_id', teamId)
+      .not('result', 'is', null)
+      .limit(1000),
+    supabase
+      .from('division_games')
+      .select('season_name, home_team, away_team')
+      .limit(5000),
+  ])
 
   if (!games) return []
 
+  // Count distinct teams per season from division_games
+  const teamsBySeasonName = new Map<string, Set<string>>()
+  for (const g of divGames ?? []) {
+    if (!teamsBySeasonName.has(g.season_name)) teamsBySeasonName.set(g.season_name, new Set())
+    teamsBySeasonName.get(g.season_name)!.add(g.home_team)
+    teamsBySeasonName.get(g.season_name)!.add(g.away_team)
+  }
+
   const bySeasonId: Record<number, {
-    name: string; start_date: string; league_position: number | null;
+    name: string; start_date: string; league_position: number | null; total_teams: number | null;
     wins: number; losses: number; draws: number; gf: number; ga: number
   }> = {}
 
   for (const g of games) {
     const s = (g.seasons as unknown) as { name: string; start_date: string; league_position: number | null }
     const sid = g.season_id
-    if (!bySeasonId[sid]) bySeasonId[sid] = { name: s.name, start_date: s.start_date, league_position: s.league_position ?? null, wins: 0, losses: 0, draws: 0, gf: 0, ga: 0 }
+    if (!bySeasonId[sid]) {
+      const total_teams = teamsBySeasonName.get(s.name)?.size ?? null
+      bySeasonId[sid] = { name: s.name, start_date: s.start_date, league_position: s.league_position ?? null, total_teams, wins: 0, losses: 0, draws: 0, gf: 0, ga: 0 }
+    }
     const row = bySeasonId[sid]
     if (g.result === 'win') row.wins++
     else if (g.result === 'loss') row.losses++

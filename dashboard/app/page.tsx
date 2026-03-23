@@ -44,12 +44,15 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-function PositionBadge({ pos }: { pos: number | null }) {
+function PositionBadge({ pos, total }: { pos: number | null; total?: number | null }) {
   if (pos === null) return <span className="text-gray-300 text-xs">—</span>
-  if (pos === 1) return <span title="1st place">🥇</span>
-  if (pos === 2) return <span title="2nd place">🥈</span>
-  if (pos === 3) return <span title="3rd place">🥉</span>
-  return <span className="text-gray-500 text-xs font-semibold">{pos}</span>
+  const suffix = total ? <span className="text-gray-300 font-normal">/{total}</span> : null
+  const isLast = total != null && pos === total
+  if (isLast) return <span title="Dead last 😬" className="text-xs font-bold text-red-400">💀 {pos}{suffix}</span>
+  if (pos === 1) return <span title="Champions">🥇 <span className="text-xs text-gray-400 font-normal">{pos}{suffix}</span></span>
+  if (pos === 2) return <span title="Runners-up">🥈 <span className="text-xs text-gray-400 font-normal">{pos}{suffix}</span></span>
+  if (pos === 3) return <span title="3rd place">🥉 <span className="text-xs text-gray-400 font-normal">{pos}{suffix}</span></span>
+  return <span className="text-gray-500 text-xs font-semibold">{pos}{suffix}</span>
 }
 
 // ── page ───────────────────────────────────────────────────────────────────
@@ -294,7 +297,7 @@ export default async function Home({
                       <tr key={i} className={`${i !== seasonHistory.length - 1 ? 'border-b border-gray-100' : ''} hover:bg-gray-50`}>
                         <td className="px-5 py-3 font-medium text-gray-800">{s.name}</td>
                         <td className="px-3 py-3 text-center text-lg leading-none">
-                          <PositionBadge pos={s.league_position} />
+                          <PositionBadge pos={s.league_position} total={s.total_teams} />
                         </td>
                         <td className="px-3 py-3 text-center text-[#009C3B] font-bold">{s.wins}</td>
                         <td className="px-3 py-3 text-center text-gray-500">{s.draws}</td>
