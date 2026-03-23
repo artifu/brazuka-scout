@@ -68,9 +68,15 @@ BRAZUKA_SEASONS = [
     ("172413", "Winter I 2021"),
 ]
 
-# ─── STEP 1: Scrape Brazuka games ──────────────────────────────────────────────
-print("\n── Step 1: Scraping Brazuka games from Arena Sports ──")
+# ─── STEP 1: Scrape Brazuka + Receba games ────────────────────────────────────
+print("\n── Step 1a: Scraping Brazuka games from Arena Sports ──")
 result = subprocess.run([sys.executable, "scrape_arena.py"], capture_output=True, text=True)
+print(result.stdout[-2000:] if result.stdout else "(no output)")
+if result.returncode != 0:
+    print("WARNING:", result.stderr[-500:])
+
+print("\n── Step 1b: Scraping Receba games from Arena Sports ──")
+result = subprocess.run([sys.executable, "scrape_receba.py"], capture_output=True, text=True)
 print(result.stdout[-2000:] if result.stdout else "(no output)")
 if result.returncode != 0:
     print("WARNING:", result.stderr[-500:])
