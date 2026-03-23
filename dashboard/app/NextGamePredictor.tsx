@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import type { NextGame } from '@/lib/data'
+import type { NextGame, DivisionStanding } from '@/lib/data'
 
 // ── Model constants (calibrated on 873 division games 2021-2025) ───────────
 const INTERCEPT = -0.321
@@ -82,7 +82,7 @@ function GamePicker({ games, selectedIdx }: { games: NextGame[]; selectedIdx: nu
 
 // ── Main ───────────────────────────────────────────────────────────────────
 export default function NextGamePredictor({
-  nextGame, h2h, eloTeams, brazukaElo, upcomingGames, selectedIdx,
+  nextGame, h2h, eloTeams, brazukaElo, upcomingGames, selectedIdx, divisionStandings,
 }: {
   nextGame: NextGame
   h2h: H2H
@@ -90,7 +90,15 @@ export default function NextGamePredictor({
   brazukaElo: number
   upcomingGames: NextGame[]
   selectedIdx: number
+  divisionStandings: DivisionStanding[]
 }) {
+  // Division standings lookup
+  const brazukaRow = divisionStandings.find(s => s.team.toLowerCase().includes('brazuka'))
+  const oppKeyword = nextGame.opponent.split(/\s+/).filter(w => w.length > 2)[0]?.toLowerCase() ?? ''
+  const oppRow = divisionStandings.find(s => s.team.toLowerCase().includes(oppKeyword))
+  const totalTeams = divisionStandings[0]?.totalTeams ?? 0
+  const seasonLabel = divisionStandings[0]?.seasonName ?? ''
+
   const opp     = eloTeams.find(t => t.team_name.toLowerCase().includes(nextGame.opponent.toLowerCase().split(' ')[0].toLowerCase()))
   const oppElo  = opp?.rating ?? 1000
   const isHome  = nextGame.homeOrAway === 'home'
@@ -118,6 +126,13 @@ export default function NextGamePredictor({
           </div>
         </div>
         <div className="text-right text-xs text-gray-400 space-y-0.5">
+          {brazukaRow && (
+            <div className="text-[11px] text-gray-400 mb-1">
+              <span className="font-semibold text-[#009C3B]">#{brazukaRow.pos}</span>
+              {oppRow && <> vs <span className="font-semibold text-gray-600">#{oppRow.pos}</span></>}
+              {totalTeams > 0 && <span className="text-gray-300"> /{totalTeams} · {seasonLabel}</span>}
+            </div>
+          )}
           <div>Brazuka <span className="font-bold text-[#009C3B]">{brazukaElo.toFixed(0)}</span></div>
           <div>{nextGame.opponent.split(' ')[0]} <span className="font-bold text-gray-600">{oppElo.toFixed(0)}{!opp ? ' (est.)' : ''}</span></div>
           <div className={`font-semibold ${eloDiff > 25 ? 'text-[#009C3B]' : eloDiff < -25 ? 'text-red-500' : 'text-gray-400'}`}>

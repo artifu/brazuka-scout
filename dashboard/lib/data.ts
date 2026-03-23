@@ -283,7 +283,7 @@ export async function getSeasonHistory(teamId: number) {
   }> = {}
 
   for (const g of games) {
-    const s = g.seasons as { name: string; start_date: string; league_position: number | null }
+    const s = (g.seasons as unknown) as { name: string; start_date: string; league_position: number | null }
     const sid = g.season_id
     if (!bySeasonId[sid]) bySeasonId[sid] = { name: s.name, start_date: s.start_date, league_position: s.league_position ?? null, wins: 0, losses: 0, draws: 0, gf: 0, ga: 0 }
     const row = bySeasonId[sid]
@@ -369,6 +369,46 @@ export async function getGoalkeeperStats() {
       ptsRate: mp > 0 ? Math.round((pts / (mp * 3)) * 100) : null,
     }
   })
+}
+
+export type DivisionStanding = {
+  team: string; pos: number; mp: number; pts: number; totalTeams: number; seasonName: string
+}
+
+export async function getCurrentSeasonStandings(): Promise<DivisionStanding[]> {
+  // Get most recent season name that has games
+  const { data: latest } = await supabase
+    .from('division_games')
+    .select('season_name, game_date')
+    .order('game_date', { ascending: false })
+    .limit(1)
+  if (!latest?.[0]) return []
+
+  const seasonName = latest[0].season_name
+  const { data: games } = await supabase
+    .from('division_games')
+    .select('home_team, away_team, home_score, away_score')
+    .eq('season_name', seasonName)
+    .limit(500)
+  if (!games) return []
+
+  const t: Record<string, { mp: number; w: number; d: number; l: number; gf: number; ga: number }> = {}
+  const add = (name: string) => { if (!t[name]) t[name] = { mp: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 } }
+  for (const g of games) {
+    add(g.home_team); add(g.away_team)
+    t[g.home_team].mp++; t[g.away_team].mp++
+    t[g.home_team].gf += g.home_score; t[g.home_team].ga += g.away_score
+    t[g.away_team].gf += g.away_score; t[g.away_team].ga += g.home_score
+    if (g.home_score > g.away_score)      { t[g.home_team].w++; t[g.away_team].l++ }
+    else if (g.home_score < g.away_score) { t[g.home_team].l++; t[g.away_team].w++ }
+    else                                   { t[g.home_team].d++; t[g.away_team].d++ }
+  }
+
+  const totalTeams = Object.keys(t).length
+  return Object.entries(t)
+    .map(([team, s]) => ({ team, pts: s.w * 3 + s.d, gd: s.gf - s.ga, mp: s.mp }))
+    .sort((a, b) => b.pts - a.pts || b.gd - a.gd)
+    .map((s, i) => ({ team: s.team, pos: i + 1, mp: s.mp, pts: s.pts, totalTeams, seasonName }))
 }
 
 export async function getTopOpponents(teamId: number, seasonId?: number) {

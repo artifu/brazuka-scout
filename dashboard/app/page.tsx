@@ -1,4 +1,4 @@
-import { getGames, getTopPlayers, getOverallRecord, getSeasons, getSeasonHistory, getTopOpponents, getEloRankings, getPlayerImpact, getGoalkeeperStats, getUpcomingGames, getHeadToHead, savePrediction } from '@/lib/data'
+import { getGames, getTopPlayers, getOverallRecord, getSeasons, getSeasonHistory, getTopOpponents, getEloRankings, getPlayerImpact, getGoalkeeperStats, getUpcomingGames, getHeadToHead, savePrediction, getCurrentSeasonStandings } from '@/lib/data'
 import PlayerTable from './PlayerTable'
 import SeasonFilter from './SeasonFilter'
 import NextGamePredictor from './NextGamePredictor'
@@ -63,7 +63,7 @@ export default async function Home({
   const teamId = team ? parseInt(team) : 1
   const seasonId = season ? parseInt(season) : undefined
 
-  const [games, players, record, seasons, seasonHistory, topOpponents, eloRankings, playerImpact, goalkeepers, upcomingGames] = await Promise.all([
+  const [games, players, record, seasons, seasonHistory, topOpponents, eloRankings, playerImpact, goalkeepers, upcomingGames, divisionStandings] = await Promise.all([
     getGames(seasonId, teamId),
     getTopPlayers(seasonId, teamId),
     getOverallRecord(seasonId, teamId),
@@ -74,6 +74,7 @@ export default async function Home({
     getPlayerImpact(),
     getGoalkeeperStats(),
     (!seasonId && teamId === 1) ? getUpcomingGames() : Promise.resolve([] as Awaited<ReturnType<typeof getUpcomingGames>>),
+    (!seasonId && teamId === 1) ? getCurrentSeasonStandings() : Promise.resolve([] as Awaited<ReturnType<typeof getCurrentSeasonStandings>>),
   ])
 
   const gameIdx = gameParam ? Math.max(0, Math.min(parseInt(gameParam), upcomingGames.length - 1)) : 0
@@ -179,6 +180,7 @@ export default async function Home({
               brazukaElo={brazukaElo}
               upcomingGames={upcomingGames}
               selectedIdx={gameIdx}
+              divisionStandings={divisionStandings}
             />
           </section>
         )}

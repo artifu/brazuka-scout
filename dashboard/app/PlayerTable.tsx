@@ -97,9 +97,13 @@ export default function PlayerTable({ players }: { players: Player[] }) {
             <th className="px-3 py-3 text-left text-gray-400">Player</th>
             <Th label="G"      k="goals"            title="Goals" />
             <Th label="A"      k="assists"           title="Assists" />
-            <Th label="G+A"    k="contributions"     title="Goals + Assists" />
+            <th className="hidden sm:table-cell px-3 py-3 text-center text-gray-400 cursor-pointer select-none" onClick={() => handleSort('contributions')} title="Goals + Assists">
+              G+A<span className="ml-0.5 text-[10px]">{sortKey === 'contributions' ? (sortDesc ? '▼' : '▲') : ''}</span>
+            </th>
             <Th label="MP"     k="gamesPlayed"       title="Matches Played" />
-            <Th label="G+A/MP" k="participationRate" title="Goal contributions per match" />
+            <th className="hidden sm:table-cell px-3 py-3 text-center text-gray-400 cursor-pointer select-none" onClick={() => handleSort('participationRate')} title="Goal contributions per match">
+              G+A/MP<span className="ml-0.5 text-[10px]">{sortKey === 'participationRate' ? (sortDesc ? '▼' : '▲') : ''}</span>
+            </th>
             <Th label="Win Lift" k="winLift"         title="Win probability increase when player is present (OLS regression, controlled for opponent strength)" />
           </tr>
         </thead>
@@ -112,13 +116,13 @@ export default function PlayerTable({ players }: { players: Player[] }) {
               <td className={`px-3 py-3 text-center tabular-nums ${sortKey === 'assists' ? 'text-[#002776] font-bold' : 'text-gray-500'}`}>
                 {p.assists > 0 ? p.assists : <span className="text-gray-300">—</span>}
               </td>
-              <td className={`px-3 py-3 text-center tabular-nums font-bold ${sortKey === 'contributions' ? 'text-[#009C3B]' : 'text-gray-600'}`}>{p.contributions}</td>
+              <td className={`hidden sm:table-cell px-3 py-3 text-center tabular-nums font-bold ${sortKey === 'contributions' ? 'text-[#009C3B]' : 'text-gray-600'}`}>{p.contributions}</td>
               <td className="px-3 py-3 text-center text-gray-400 tabular-nums">
                 {p.gamesPlayed != null
                   ? <>{p.gpInferred && <span className="text-gray-300 text-[10px] mr-0.5">≥</span>}{p.gamesPlayed}</>
                   : <span className="text-gray-300">—</span>}
               </td>
-              <td className="px-3 py-3 text-right tabular-nums">
+              <td className="hidden sm:table-cell px-3 py-3 text-right tabular-nums">
                 {p.participationRate != null
                   ? <span className={`font-semibold ${sortKey === 'participationRate' ? 'text-[#009C3B]' : 'text-gray-700'}`}>{p.participationRate.toFixed(2)}</span>
                   : <span className="text-gray-300">—</span>}
