@@ -44,19 +44,20 @@ def clean_name(name):
     name = re.sub(r"\s+(?:NP(?:GK)?\s*\d*|N\dP)\s*$", "", name, flags=re.IGNORECASE).strip()
     # Strip trailing " - ..." season tags FIRST (Arena Sports appends e.g. "- Aug 2023")
     name = re.sub(r"\s+-.*$", "", name).strip()
-    # "(RED) Thur Men's D1" or "(Iss) Thur Mens D" — venue tag before division
+    # "(RED) Thur Men's D1" or "(Iss) Thur's Mens D" — venue tag before division
+    # Day variants: Thur / Thurs / Thur's
     name = re.sub(
-        r"\s*\([A-Za-z/]{2,7}\)\s+(?:Thurs?\.?\s+)?Men(?:s|'s)?\s+[CD]\d*\s*(?:\([MS]\))?\s*$",
+        r"\s*\([A-Za-z/]{2,7}\)\s+(?:Thur(?:'?s)?\.?\s+)?Men(?:s|'s)?\s+[CD]\d*\s*(?:\([MS]\))?\s*$",
         "", name, flags=re.IGNORECASE,
     ).strip()
     # "Thurs Men's C2 (RED)" — venue tag after division
     name = re.sub(
-        r"\s+Thurs?\.?\s+Men(?:s|'s)?\s+[CD]\d*\s*\([A-Za-z/]{2,7}\)\s*$",
+        r"\s+Thur(?:'?s)?\.?\s+Men(?:s|'s)?\s+[CD]\d*\s*\([A-Za-z/]{2,7}\)\s*$",
         "", name, flags=re.IGNORECASE,
     ).strip()
     # "(RED) Thurs C2" — no "Men's", just venue + day + division letter
     name = re.sub(
-        r"\s*\([A-Za-z/]{2,7}\)\s+(?:Thurs?\.?\s+)?[CD]\d+\s*$",
+        r"\s*\([A-Za-z/]{2,7}\)\s+(?:Thur(?:'?s)?\.?\s+)?[CD]\d+\s*$",
         "", name, flags=re.IGNORECASE,
     ).strip()
     # "(RED/ISS) Thur Men's D1" — dual venue
@@ -65,6 +66,9 @@ def clean_name(name):
         "", name, flags=re.IGNORECASE,
     ).strip()
     name = re.sub(r"\s*\([MS]\)\s*$", "", name, flags=re.IGNORECASE).strip()
+    # Normalize known all-caps team names so they don't produce duplicates
+    if name.upper() == "RECEBA FC":
+        name = "Receba FC"
     return name
 
 total_inserted = 0
