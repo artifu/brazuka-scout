@@ -1,4 +1,4 @@
-import { getGames, getTopPlayers, getOverallRecord, getSeasons, getSeasonHistory, getTopOpponents, getEloRankings, getPlayerImpact, getGoalkeeperStats, getUpcomingGames, getHeadToHead, savePrediction, getCurrentSeasonStandings } from '@/lib/data'
+import { getGames, getTopPlayers, getOverallRecord, getSeasons, getSeasonHistory, getTopOpponents, getEloRankings, getPlayerImpact, getGoalkeeperStats, getUpcomingGames, getUpcomingRecebaGames, getHeadToHead, savePrediction, getCurrentSeasonStandings } from '@/lib/data'
 import PlayerTable from './PlayerTable'
 import SeasonFilter from './SeasonFilter'
 import NextGamePredictor from './NextGamePredictor'
@@ -73,11 +73,13 @@ export default async function Home({
     getSeasons(teamId),
     getSeasonHistory(teamId),
     getTopOpponents(teamId, seasonId),
-    getEloRankings(),
+    getEloRankings(teamId === 2 ? 'receba' : 'brazuka'),
     getPlayerImpact(),
     getGoalkeeperStats(),
-    (!seasonId && teamId === 1) ? getUpcomingGames() : Promise.resolve([] as Awaited<ReturnType<typeof getUpcomingGames>>),
-    (!seasonId && teamId === 1) ? getCurrentSeasonStandings() : Promise.resolve([] as Awaited<ReturnType<typeof getCurrentSeasonStandings>>),
+    (!seasonId && teamId === 1) ? getUpcomingGames() :
+    (!seasonId && teamId === 2) ? getUpcomingRecebaGames() :
+    Promise.resolve([] as Awaited<ReturnType<typeof getUpcomingGames>>),
+    (!seasonId) ? getCurrentSeasonStandings(teamId === 2 ? 'receba' : 'brazuka') : Promise.resolve([] as Awaited<ReturnType<typeof getCurrentSeasonStandings>>),
   ])
 
   const gameIdx = gameParam ? Math.max(0, Math.min(parseInt(gameParam), upcomingGames.length - 1)) : 0
@@ -95,14 +97,16 @@ export default async function Home({
     }
   })
 
-  const brazukaElo = eloRankings.find(r => r.team_name === 'Brazuka US')?.rating ?? 1000
+  const myTeamElo = teamId === 2
+    ? eloRankings.find(r => r.team_name === 'Receba FC')?.rating ?? 1000
+    : eloRankings.find(r => r.team_name === 'Brazuka US')?.rating ?? 1000
 
   // Snapshot prediction for the next game (upserts — safe to call on every render)
   if (nextGame) {
     const oppElo = eloRankings.find(t => t.team_name.toLowerCase().includes(
       nextGame.opponent.split(' ').filter(w => w.length > 2)[0]?.toLowerCase() ?? ''
     ))?.rating ?? 1000
-    savePrediction(nextGame, brazukaElo, oppElo).catch(() => {})
+    savePrediction(nextGame, myTeamElo, oppElo).catch(() => {})
   }
   const total = record.wins + record.losses + record.draws
   const winPct = total > 0 ? Math.round((record.wins / total) * 100) : 0
@@ -172,15 +176,15 @@ export default async function Home({
           </div>
         </section>
 
-        {/* Next Game Predictor — only on all-time view for team 1 */}
-        {!seasonId && teamId === 1 && upcomingGames.length > 0 && nextGame && (
+        {/* Next Game Predictor — all-time view for both teams */}
+        {!seasonId && upcomingGames.length > 0 && nextGame && (
           <section>
             <SectionLabel>Next Game</SectionLabel>
             <NextGamePredictor
               nextGame={nextGame}
               h2h={h2h}
               eloTeams={eloRankings}
-              brazukaElo={brazukaElo}
+              brazukaElo={myTeamElo}
               upcomingGames={upcomingGames}
               selectedIdx={gameIdx}
               divisionStandings={divisionStandings}
@@ -321,7 +325,8 @@ export default async function Home({
           </section>
         )}
 
-        {/* Goalkeepers */}
+        {/* Goalkeepers — Brazuka only */}
+        {teamId === 1 && (
         <section>
           <SectionLabel>Goalkeepers</SectionLabel>
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
@@ -362,12 +367,18 @@ export default async function Home({
             </div>
           </div>
         </section>
+        )}
 
         {/* ELO Division Rankings */}
         {eloRankings.length > 0 && (
           <section>
             <SectionLabel>Division ELO Rankings</SectionLabel>
-            <p className="text-gray-400 text-xs mb-3">All-time power ranking across all teams in Brazuka&apos;s Tuesday Men&apos;s division. Based on {eloRankings.reduce((s, r) => s + r.games_played, 0) / 2 | 0}+ league games since 2021. Starting ELO: 1000.</p>
+            <p className="text-gray-400 text-xs mb-3">
+              {teamId === 2
+                ? `All-time power ranking across all teams in Receba FC\u2019s Thursday division. Based on ${eloRankings.reduce((s, r) => s + r.games_played, 0) / 2 | 0}+ league games since 2023. Starting ELO: 1000.`
+                : `All-time power ranking across all teams in Brazuka\u2019s Tuesday Men\u2019s division. Based on ${eloRankings.reduce((s, r) => s + r.games_played, 0) / 2 | 0}+ league games since 2021. Starting ELO: 1000.`
+              }
+            </p>
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
               <table className="w-full text-sm">
                 <thead>
@@ -380,17 +391,17 @@ export default async function Home({
                 </thead>
                 <tbody>
                   {eloRankings.map((r, i) => {
-                    const isBrazuka = r.team_name === 'Brazuka US'
+                    const isMyTeam = teamId === 2 ? r.team_name === 'Receba FC' : r.team_name === 'Brazuka US'
                     return (
-                      <tr key={r.team_name} className={`${i !== eloRankings.length - 1 ? 'border-b border-gray-100' : ''} ${isBrazuka ? 'bg-[#009C3B]/5' : 'hover:bg-gray-50'}`}>
+                      <tr key={r.team_name} className={`${i !== eloRankings.length - 1 ? 'border-b border-gray-100' : ''} ${isMyTeam ? 'bg-[#009C3B]/5' : 'hover:bg-gray-50'}`}>
                         <td className="px-5 py-3 text-gray-400 text-xs tabular-nums">{i + 1}</td>
                         <td className="px-3 py-3 font-medium text-gray-800">
                           {r.team_name}
-                          {isBrazuka && <span className="ml-2 text-[10px] font-bold text-[#009C3B] bg-[#009C3B]/10 px-1.5 py-0.5 rounded-full">US</span>}
+                          {isMyTeam && <span className="ml-2 text-[10px] font-bold text-[#009C3B] bg-[#009C3B]/10 px-1.5 py-0.5 rounded-full">{teamId === 2 ? 'FC' : 'US'}</span>}
                         </td>
                         <td className="px-3 py-3 text-center text-gray-400 tabular-nums text-xs">{r.games_played}</td>
                         <td className="px-5 py-3 text-right">
-                          <span className={`font-black tabular-nums ${isBrazuka ? 'text-[#009C3B]' : 'text-gray-700'}`}>
+                          <span className={`font-black tabular-nums ${isMyTeam ? 'text-[#009C3B]' : 'text-gray-700'}`}>
                             {r.rating.toFixed(0)}
                           </span>
                         </td>

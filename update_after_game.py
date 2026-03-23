@@ -88,12 +88,18 @@ print(result.stdout[-2000:] if result.stdout else "(no output)")
 if result.returncode != 0:
     print("WARNING:", result.stderr[-500:])
 
-# ─── STEP 3: Recompute ELO ────────────────────────────────────────────────────
-print("\n── Step 3: Recomputing ELO ratings ──")
+print("\n── Step 2b: Updating Receba division games ──")
+result = subprocess.run([sys.executable, "populate_receba_division_games.py"], capture_output=True, text=True)
+print(result.stdout[-2000:] if result.stdout else "(no output)")
+if result.returncode != 0:
+    print("WARNING:", result.stderr[-500:])
 
-# Fetch all division games in chronological order
+# ─── STEP 3: Recompute ELO ────────────────────────────────────────────────────
+print("\n── Step 3: Recomputing Brazuka ELO ratings ──")
+
 games_raw = sb.table("division_games") \
     .select("game_date, home_team, away_team, home_score, away_score") \
+    .eq("league", "brazuka") \
     .order("game_date", desc=False) \
     .limit(5000) \
     .execute().data
@@ -114,14 +120,49 @@ for g in games_raw:
     ratings[at] += K * (score_a - exp_a)
     played[ht] += 1; played[at] += 1
 
-# Upsert into elo_ratings
 rows = [
-    {"team_name": t, "rating": round(r, 2), "games_played": played[t], "updated_at": "now()"}
+    {"team_name": t, "rating": round(r, 2), "games_played": played[t], "league": "brazuka"}
     for t, r in sorted(ratings.items(), key=lambda x: -x[1])
 ]
-sb.table("elo_ratings").upsert(rows, on_conflict="team_name").execute()
-print(f"  ✓ {len(rows)} ELO ratings updated")
-print(f"  Top 5: {', '.join(f'{r[\"team_name\"]} ({r[\"rating\"]:.0f})' for r in rows[:5])}")
+sb.table("elo_ratings").delete().eq("league", "brazuka").execute()
+sb.table("elo_ratings").insert(rows).execute()
+print(f"  ✓ {len(rows)} Brazuka ELO ratings updated")
+top5 = ', '.join('{} ({:.0f})'.format(r['team_name'], r['rating']) for r in rows[:5])
+print(f"  Top 5: {top5}")
+
+print("\n── Step 3b: Recomputing Receba ELO ratings ──")
+
+receba_games_raw = sb.table("division_games") \
+    .select("game_date, home_team, away_team, home_score, away_score") \
+    .eq("league", "receba") \
+    .order("game_date", desc=False) \
+    .limit(5000) \
+    .execute().data
+
+receba_ratings: dict[str, float] = defaultdict(lambda: 1000.0)
+receba_played: dict[str, int] = defaultdict(int)
+
+for g in receba_games_raw:
+    ht, at = g["home_team"], g["away_team"]
+    hs, as_ = g["home_score"], g["away_score"]
+    re_h = receba_ratings[ht]; re_a = receba_ratings[at]
+    exp_h = 1 / (1 + 10 ** ((re_a - re_h) / 400))
+    exp_a = 1 - exp_h
+    score_h = 1.0 if hs > as_ else (0.5 if hs == as_ else 0.0)
+    score_a = 1.0 - score_h
+    receba_ratings[ht] += K * (score_h - exp_h)
+    receba_ratings[at] += K * (score_a - exp_a)
+    receba_played[ht] += 1; receba_played[at] += 1
+
+receba_rows = [
+    {"team_name": t, "rating": round(r, 2), "games_played": receba_played[t], "league": "receba"}
+    for t, r in sorted(receba_ratings.items(), key=lambda x: -x[1])
+]
+sb.table("elo_ratings").delete().eq("league", "receba").execute()
+sb.table("elo_ratings").insert(receba_rows).execute()
+print(f"  ✓ {len(receba_rows)} Receba ELO ratings updated")
+top5r = ', '.join('{} ({:.0f})'.format(r['team_name'], r['rating']) for r in receba_rows[:5])
+print(f"  Top 5: {top5r}")
 
 # ─── STEP 4: Update league position ───────────────────────────────────────────
 print("\n── Step 4: Updating league position ──")

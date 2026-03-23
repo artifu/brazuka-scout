@@ -4,6 +4,7 @@ import { unstable_noStore as noStore } from 'next/cache'
 // ── Arena Sports config ────────────────────────────────────────────────────
 // Update BRAZUKA_TEAM_ID each new season (Arena Sports team ID for Brazuka US)
 const BRAZUKA_ARENA_TEAM_ID = '219258'  // Winter II 2025-26
+const RECEBA_ARENA_TEAM_ID = '215356'   // Fall 2025
 const ARENA_BASE = 'https://apps.daysmartrecreation.com/dash/jsonapi/api/v1'
 const ARENA_HEADERS = { 'Accept': 'application/vnd.api+json', 'User-Agent': 'Mozilla/5.0' }
 
@@ -13,6 +14,14 @@ function cleanOpponentName(name: string): string {
     .replace(/\s*\((?:Tues?\.?\s+Men'?s?\s+D\d*|Tue\s+Men'?s?\s+D\d*|M|S)\)\s*(?:\([MS]\)\s*)?$/i, '')
     .replace(/\s*\([MS]\)\s*$/i, '')
     .replace(/\s+NP\s*\d*$/i, '')
+    .trim()
+}
+
+function cleanRecebaOpponentName(name: string): string {
+  return name
+    .replace(/\s*\([A-Z]{2,4}\)\s+(?:Thurs?\.?\s+)?Men[s']?\s+[CD]\d*\s*(?:-\s*\S+)?\s*$/i, '')
+    .replace(/\s*\([MS]\)\s*$/i, '')
+    .replace(/\s+-\s*(?:\w+\s*\d*\s*)?$/i, '')
     .trim()
 }
 
@@ -54,6 +63,51 @@ export async function getUpcomingGames(): Promise<NextGame[]> {
       const oppTeam = included[oppId]
       if (!oppTeam) continue
       const oppName = cleanOpponentName(oppTeam.attributes.name as string)
+
+      const resourceId = (ev as { relationships?: { resource?: { data?: { id: string } } } }).relationships?.resource?.data?.id
+      const field = resourceId ? (included[resourceId]?.attributes?.name as string | null ?? null) : null
+
+      upcoming.push({ date: gameDate, opponent: oppName, homeOrAway: isHome ? 'home' : 'away', field })
+    }
+
+    upcoming.sort((a, b) => a.date.localeCompare(b.date))
+    return upcoming
+  } catch {
+    return []
+  }
+}
+
+export async function getUpcomingRecebaGames(): Promise<NextGame[]> {
+  noStore()
+  try {
+    const url = `${ARENA_BASE}/teams/${RECEBA_ARENA_TEAM_ID}?cache[save]=false&include=events.homeTeam,events.visitingTeam,events.resource&company=arenasports`
+    const res = await fetch(url, { headers: ARENA_HEADERS, next: { revalidate: 3600 } })
+    if (!res.ok) return []
+    const data = await res.json()
+
+    const included: Record<string, { type: string; attributes: Record<string, unknown> }> = {}
+    for (const item of data.included ?? []) included[item.id] = item
+
+    const today = new Date().toISOString().slice(0, 10)
+    const evRefs: { id: string }[] = data.data?.relationships?.events?.data ?? []
+
+    const upcoming: NextGame[] = []
+    for (const ref of evRefs) {
+      const ev = included[ref.id]
+      if (!ev || ev.type !== 'events') continue
+      const a = ev.attributes
+      if (a.home_score != null || a.visiting_score != null) continue
+
+      const gameDate = ((a.start_date ?? a.start ?? '') as string).slice(0, 10)
+      if (!gameDate || gameDate < today) continue
+
+      const ht = String(a.hteam_id ?? '')
+      const vt = String(a.vteam_id ?? '')
+      const isHome = ht === RECEBA_ARENA_TEAM_ID
+      const oppId  = isHome ? vt : ht
+      const oppTeam = included[oppId]
+      if (!oppTeam) continue
+      const oppName = cleanRecebaOpponentName(oppTeam.attributes.name as string)
 
       const resourceId = (ev as { relationships?: { resource?: { data?: { id: string } } } }).relationships?.resource?.data?.id
       const field = resourceId ? (included[resourceId]?.attributes?.name as string | null ?? null) : null
@@ -316,10 +370,11 @@ export async function getSeasonHistory(teamId: number) {
   )
 }
 
-export async function getEloRankings() {
+export async function getEloRankings(league = 'brazuka') {
   const { data } = await supabase
     .from('elo_ratings')
     .select('team_name, rating, games_played')
+    .eq('league', league)
     .order('rating', { ascending: false })
     .limit(50)
   return data ?? []
@@ -392,11 +447,11 @@ export type DivisionStanding = {
   team: string; pos: number; mp: number; pts: number; totalTeams: number; seasonName: string
 }
 
-export async function getCurrentSeasonStandings(): Promise<DivisionStanding[]> {
-  // Get most recent season name that has games
+export async function getCurrentSeasonStandings(league = 'brazuka'): Promise<DivisionStanding[]> {
   const { data: latest } = await supabase
     .from('division_games')
     .select('season_name, game_date')
+    .eq('league', league)
     .order('game_date', { ascending: false })
     .limit(1)
   if (!latest?.[0]) return []
@@ -406,6 +461,7 @@ export async function getCurrentSeasonStandings(): Promise<DivisionStanding[]> {
     .from('division_games')
     .select('home_team, away_team, home_score, away_score')
     .eq('season_name', seasonName)
+    .eq('league', league)
     .limit(500)
   if (!games) return []
 

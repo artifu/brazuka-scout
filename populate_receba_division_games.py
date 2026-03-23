@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Fetch every intra-division game for all Brazuka seasons from the Arena Sports API
-and populate the division_games table.
+Fetch every intra-division game for all Receba seasons from the Arena Sports API
+and populate the division_games table with league='receba'.
 """
 import os, time, re
 from pathlib import Path
@@ -19,27 +19,20 @@ sb = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"
 BASE = "https://apps.daysmartrecreation.com/dash/jsonapi/api/v1"
 HEADERS = {"Accept": "application/vnd.api+json", "User-Agent": "Mozilla/5.0"}
 
-BRAZUKA_SEASONS = [
-    ("215810", "Winter I 2025"),
-    ("214012", "Fall 2025"),
-    ("213250", "Summer 2025"),
-    ("211302", "Spring 2025"),
-    ("208137", "Winter II 2025"),
-    ("205470", "Winter I 2024"),
-    ("204186", "Fall 2024"),
-    ("202652", "Summer 2024"),
-    ("200446", "Spring 2024"),
-    ("196948", "Winter II 2024"),
-    ("194228", "Winter I 2023"),
-    ("193131", "Fall 2023"),
-    ("190812", "Summer 2023"),
-    ("187808", "Spring 2023"),
-    ("184892", "Winter II 2023"),
-    ("181899", "Winter I 2022"),
-    ("181297", "Fall 2022"),
-    ("177686", "Spring 2022"),
-    ("174858", "Winter II 2022"),
-    ("172413", "Winter I 2021"),
+RECEBA_SEASONS = [
+    ("185442", "Winter II 2023"),
+    ("188396", "Spring 2023"),
+    ("191108", "Summer 2023"),
+    ("193613", "Fall 2023"),
+    ("194005", "Winter I 2024"),
+    ("198056", "Winter II 2024"),
+    ("200182", "Spring 2024"),
+    ("202425", "Summer 2024"),
+    ("204470", "Fall 2024"),
+    ("205255", "Winter I 2025"),
+    ("208368", "Winter II 2025"),
+    ("213934", "Summer 2025"),
+    ("215356", "Fall 2025"),
 ]
 
 def get(url):
@@ -48,28 +41,26 @@ def get(url):
     return r.json()
 
 def clean_name(name):
-    """Strip Arena Sports division suffixes."""
     name = re.sub(r"\s+(?:NP(?:GK)?\s*\d*|N\dP)\s*$", "", name, flags=re.IGNORECASE).strip()
-    name = re.sub(r"\s*\((?:Tues?\.?\s+Men'?s?\s+D\d*|Tue\s+Men'?s?\s+D\d*|M|S)\)\s*(?:\([MS]\)\s*)?$", "", name, flags=re.IGNORECASE).strip()
+    name = re.sub(r"\s*\([A-Z]{2,4}\)\s+(?:Thurs?\.?\s+)?Men[s']?\s+[CD]\d*\s*(?:\([MS]\))?\s*(?:-\s*\S+)?\s*$", "", name, flags=re.IGNORECASE).strip()
+    name = re.sub(r"\s*\([A-Z]{2,4}/[A-Z]{2,4}\)\s+(?:Thurs?\.?\s+)?Men[s']?\s+[CD]\d*\s*$", "", name, flags=re.IGNORECASE).strip()
     name = re.sub(r"\s*\([MS]\)\s*$", "", name, flags=re.IGNORECASE).strip()
-    name = re.sub(r"\s+NP\s*\d*$", "", name, flags=re.IGNORECASE).strip()
+    name = re.sub(r"\s+-\s*(?:\w+\s*\d*\s*)?$", "", name).strip()
     return name
 
 total_inserted = 0
 total_skipped = 0
 
-for brazuka_team_id, season_name in BRAZUKA_SEASONS:
+for receba_team_id, season_name in RECEBA_SEASONS:
     print(f"── {season_name}", end="  ", flush=True)
 
-    # Get league_id from Brazuka's team record
     try:
-        data = get(f"{BASE}/teams/{brazuka_team_id}?cache[save]=false&company=arenasports")
+        data = get(f"{BASE}/teams/{receba_team_id}?cache[save]=false&company=arenasports")
         league_id = str(data["data"]["attributes"]["league_id"])
     except Exception as e:
         print(f"ERROR getting team: {e}")
         continue
 
-    # Get all division team IDs + names
     try:
         data2 = get(f"{BASE}/leagues/{league_id}?include=teams&company=arenasports")
     except Exception as e:
@@ -84,7 +75,6 @@ for brazuka_team_id, season_name in BRAZUKA_SEASONS:
         print("no teams")
         continue
 
-    # Fetch events for each team, deduplicate by event id
     seen_events = set()
     games = []
 
@@ -93,7 +83,7 @@ for brazuka_team_id, season_name in BRAZUKA_SEASONS:
                "&include=events.homeTeam,events.visitingTeam&company=arenasports")
         try:
             d = get(url)
-        except Exception as e:
+        except Exception:
             time.sleep(0.3)
             continue
 
@@ -120,7 +110,7 @@ for brazuka_team_id, season_name in BRAZUKA_SEASONS:
             ht = str(a.get("hteam_id", ""))
             vt = str(a.get("vteam_id", ""))
             if ht not in teams or vt not in teams:
-                continue  # skip inter-division fixtures
+                continue
 
             game_date = (a.get("start_date") or a.get("start", ""))[:10] or None
 
@@ -131,19 +121,18 @@ for brazuka_team_id, season_name in BRAZUKA_SEASONS:
                 "away_team":   teams[vt],
                 "home_score":  hs,
                 "away_score":  vs,
-                "league":      "brazuka",
+                "league":      "receba",
             })
         time.sleep(0.25)
 
     print(f"{len(games)} games", end="  ")
 
-    # Upsert into division_games
     inserted = skipped = 0
     for g in games:
         try:
-            result = sb.table("division_games").upsert(g, on_conflict="season_name,game_date,home_team,away_team,league").execute()
+            sb.table("division_games").upsert(g, on_conflict="season_name,game_date,home_team,away_team,league").execute()
             inserted += 1
-        except Exception as e:
+        except Exception:
             skipped += 1
 
     print(f"✓ {inserted} upserted  {skipped} errors")
