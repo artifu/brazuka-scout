@@ -400,6 +400,7 @@ export async function getPlayerImpact(): Promise<Record<number, { winLift: numbe
 const GOALKEEPERS: { id: number; name: string }[] = [
   { id: 55, name: 'Alexis' },
   { id: 40, name: 'Marcelo D' },
+  { id: 81, name: 'Igor Moreira' },
   { id: 63, name: 'Darley' },
   { id: 52, name: 'Victor Ozorio' },
 ]

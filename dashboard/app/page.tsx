@@ -1,5 +1,6 @@
 import { getGames, getTopPlayers, getOverallRecord, getSeasons, getSeasonHistory, getTopOpponents, getEloRankings, getPlayerImpact, getGoalkeeperStats, getUpcomingGames, getUpcomingRecebaGames, getHeadToHead, savePrediction, getCurrentSeasonStandings } from '@/lib/data'
 import PlayerTable from './PlayerTable'
+import GoalkeeperTable from './GoalkeeperTable'
 import SeasonFilter from './SeasonFilter'
 import NextGamePredictor from './NextGamePredictor'
 
@@ -327,46 +328,10 @@ export default async function Home({
 
         {/* Goalkeepers — Brazuka only */}
         {teamId === 1 && (
-        <section>
-          <SectionLabel>Goalkeepers</SectionLabel>
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
-                  <th className="px-5 py-3 text-left">Goalkeeper</th>
-                  <th className="px-3 py-3 text-center" title="Matches Played">MP</th>
-                  <th className="px-3 py-3 text-center" title="Goals Conceded">GC</th>
-                  <th className="px-3 py-3 text-center" title="Goals Conceded per Game">GC/MP</th>
-                  <th className="px-3 py-3 text-center" title="Win percentage">Win%</th>
-                  <th className="px-5 py-3 text-center" title="Points rate (W=3 D=1 L=0)">Pts%</th>
-                </tr>
-              </thead>
-              <tbody>
-                {goalkeepers.map((gk, i) => (
-                  <tr key={gk.id} className={`${i !== goalkeepers.length - 1 ? 'border-b border-gray-100' : ''} hover:bg-gray-50`}>
-                    <td className="px-5 py-3 font-medium text-gray-800">{gk.name}</td>
-                    <td className="px-3 py-3 text-center text-gray-500 tabular-nums">{gk.mp > 0 ? gk.mp : <span className="text-gray-300">—</span>}</td>
-                    <td className="px-3 py-3 text-center tabular-nums text-red-500 font-semibold">{gk.mp > 0 ? gk.gc : <span className="text-gray-300">—</span>}</td>
-                    <td className="px-3 py-3 text-center tabular-nums text-gray-600">{gk.gcPerGame != null ? gk.gcPerGame.toFixed(2) : <span className="text-gray-300">—</span>}</td>
-                    <td className="px-3 py-3 text-center">
-                      {gk.winPct != null
-                        ? <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${gk.winPct >= 50 ? 'bg-[#009C3B]/10 text-[#009C3B]' : 'bg-red-50 text-red-500'}`}>{gk.winPct}%</span>
-                        : <span className="text-gray-300">—</span>}
-                    </td>
-                    <td className="px-5 py-3 text-center">
-                      {gk.ptsRate != null
-                        ? <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${gk.ptsRate >= 50 ? 'bg-[#002776]/10 text-[#002776]' : 'bg-red-50 text-red-500'}`}>{gk.ptsRate}%</span>
-                        : <span className="text-gray-300">—</span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="px-5 py-2.5 bg-gray-50 text-gray-400 text-xs border-t border-gray-100">
-              Stats based on games where GK appearance was recorded. No PK data available yet.
-            </div>
-          </div>
-        </section>
+          <section>
+            <SectionLabel>Goalkeepers</SectionLabel>
+            <GoalkeeperTable goalkeepers={goalkeepers} />
+          </section>
         )}
 
         {/* ELO Division Rankings */}
