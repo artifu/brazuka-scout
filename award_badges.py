@@ -55,7 +55,7 @@ BADGE_DEFS = [
     ("friend",         "Friend",         "O que importa são os amigos que fazemos no caminho",            "friend",         "manual"),
     ("orbit",          "Orbit",          "Kicked the ball so far NASA scientists cannot explain the physics", "orbit",       "manual"),
     ("hunger",         "Hunger",         "The idiot never passes the ball. Ever.",                           "hunger",         "manual"),
-    ("ultimate_hunger","Ultimate Hunger", "Seriously, pass the ball man. The square button exists.",         "ultimate_hunger","manual"),
+    ("famine",         "Famine",          "The pass button exists. That one only shoots.",                    "famine",         "manual"),
     ("saci",           "Saci",           "Excellence in using both legs — the mischievous ambipedal trickster", "saci",       "manual"),
     ("glass_bones",    "Glass Bones",    "Showing great body resistance to impacts",                          "glass_bones", "manual"),
 ]
@@ -128,8 +128,8 @@ MANUAL_AWARDS = [
     (34, "hunger",     None, None,  "Kuster — never passes"),
     (57, "hunger",     None, None,  "Matheus Waterfall — never passes"),
     (38, "hunger",     None, None,  "Sergio Filho — never passes"),
-    # Ultimate Hunger (Kuster only)
-    (34, "ultimate_hunger", None, None, "Kuster — the square button is the only button"),
+    # Famine (Kuster only)
+    (34, "famine", None, None, "Kuster — the pass button exists. That one only shoots."),
     # Saci
     (42, "saci",       None, None,  "Caio Scofield — ambipedal excellence"),
     # Glass Bones

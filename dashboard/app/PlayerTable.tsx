@@ -101,7 +101,7 @@ const BADGE_SHORT_LABEL: Record<string, string> = {
   friend:            'Friend',
   orbit:             'Orbit',
   hunger:            'Hunger',
-  ultimate_hunger:   'Ultimate Hunger',
+  famine:            'Famine',
   saci:              'Saci',
   glass_bones:       'Glass Bones',
 }
