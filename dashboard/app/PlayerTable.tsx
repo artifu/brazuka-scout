@@ -95,11 +95,11 @@ function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {
               <span className="text-[10px] font-black text-amber-700 tabular-nums">×{count}</span>
             )}
           </div>
-          {/* Tooltip */}
-          <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-            <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
-              <p className="font-bold">{icon} {name}{count > 1 ? ` ×${count}` : ''}</p>
-              <p className="text-gray-300 mt-0.5">{description}</p>
+          {/* Tooltip — fixed-width, opens upward, won't clip */}
+          <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[9999] opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-48">
+            <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-xl">
+              <p className="font-bold leading-snug">{icon} {name}{count > 1 ? ` ×${count}` : ''}</p>
+              <p className="text-gray-300 mt-1 leading-snug">{description}</p>
             </div>
             <div className="w-2 h-2 bg-gray-900 rotate-45 mx-auto -mt-1" />
           </div>
@@ -194,7 +194,7 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
   const medal = (i: number) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm" style={{ overflow: 'visible' }}>
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-100 text-xs uppercase tracking-wider">
