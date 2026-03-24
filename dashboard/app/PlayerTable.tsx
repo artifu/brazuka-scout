@@ -75,6 +75,19 @@ function WithWithoutBlock({ stats, label }: { stats: WithWithoutStats | null; la
   )
 }
 
+const BADGE_SHORT_LABEL: Record<string, string> = {
+  hattrick:          'Hat Trick',
+  poker:             'Poker',
+  manita:            'Manita',
+  garcom:            'Garçom',
+  champ_winter1_2024: '1st Title',
+  champ_winter2_2024: '2nd Title',
+  champ_spring_2025:  '3rd Title',
+  champ_summer_2025:  '4th Title',
+  victus:            'Victus',
+  victus_ii:         'Victus II',
+}
+
 function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {
   if (badges.length === 0) return (
     <p className="text-xs text-gray-300 italic">No badges yet</p>
@@ -89,11 +102,16 @@ function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {
     <div className="flex flex-wrap gap-2">
       {Object.entries(grouped).map(([slug, { icon, name, description, count }]) => (
         <div key={slug} className="relative group">
-          <div className="flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-lg cursor-default select-none hover:bg-amber-100 transition-colors">
-            <img src={`/badges/${slug}.svg`} alt={name} className="w-7 h-7" />
-            {count > 1 && (
-              <span className="text-[10px] font-black text-amber-700 tabular-nums">×{count}</span>
-            )}
+          <div className="flex flex-col items-center gap-1 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-lg cursor-default select-none hover:bg-amber-100 transition-colors">
+            <div className="flex items-center gap-1">
+              <img src={`/badges/${slug}.svg`} alt={name} className="w-8 h-8" />
+              {count > 1 && (
+                <span className="text-[10px] font-black text-amber-700 tabular-nums">×{count}</span>
+              )}
+            </div>
+            <span className="text-[8px] font-bold text-amber-900 leading-none tracking-wide">
+              {BADGE_SHORT_LABEL[slug] ?? name}
+            </span>
           </div>
           {/* Tooltip — fixed-width, opens upward, won't clip */}
           <div className="pointer-events-none absolute bottom-full left-0 mb-2 z-[9999] opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-48">
