@@ -1,27 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Victus II — Vasco da Gama crest style -->
-  <circle cx="32" cy="32" r="30" fill="#374151" stroke="#1F2937" stroke-width="2.5"/>
+  <!-- Victus II — Vasco da Gama crest (faithful recreation) -->
+  <circle cx="32" cy="32" r="30" fill="#2D2D2D" stroke="#111" stroke-width="2"/>
 
-  <!-- Shield shape -->
-  <path d="M32,8 L50,14 L50,36 Q50,50 32,58 Q14,50 14,36 L14,14 Z" fill="white" stroke="#1F2937" stroke-width="1"/>
+  <!-- Shield outer border (black) -->
+  <path d="M14,10 L50,10 L50,42 Q50,56 32,60 Q14,56 14,42 Z" fill="#1A1A1A"/>
 
-  <!-- Black diagonal sash (banda) — top-right to bottom-left -->
-  <path d="M32,8 L50,14 L50,26 L14,48 L14,36 Z" fill="#1F2937"/>
+  <!-- Shield white fill -->
+  <path d="M16,12 L48,12 L48,42 Q48,54 32,58 Q16,54 16,42 Z" fill="white"/>
 
-  <!-- Cruz de Malta on the sash -->
-  <!-- Vertical bar of cross -->
-  <rect x="30" y="22" width="4" height="16" rx="0.5" fill="white"/>
-  <!-- Horizontal bar of cross -->
-  <rect x="24" y="28" width="16" height="4" rx="0.5" fill="white"/>
-  <!-- Cross arm flares (Malta cross style) -->
-  <polygon points="30,22 32,25 34,22 33,20 31,20" fill="white"/>
-  <polygon points="30,38 32,35 34,38 33,40 31,40" fill="white"/>
-  <polygon points="24,28 27,30 24,32 22,31 22,29" fill="white"/>
-  <polygon points="40,28 37,30 40,32 42,31 42,29" fill="white"/>
+  <!-- Diagonal black banda — upper-left to lower-right -->
+  <path d="M16,12 L48,12 L48,26 L16,48 L16,12 Z" fill="#1A1A1A"/>
+  <!-- Lower-right white section already visible from shield fill -->
 
-  <!-- "VASCO" text on white part -->
-  <text x="32" y="52" font-size="5.5" fill="#1F2937" font-weight="900" text-anchor="middle" letter-spacing="1">VASCO</text>
+  <!-- Maltese cross on the black banda, centered around 32,30 -->
+  <!-- Cross center -->
+  <g transform="translate(32,30)">
+    <!-- Vertical bar -->
+    <rect x="-2.5" y="-10" width="5" height="20" fill="white"/>
+    <!-- Horizontal bar -->
+    <rect x="-10" y="-2.5" width="20" height="5" fill="white"/>
+    <!-- Flared ends — top -->
+    <polygon points="-2.5,-10 0,-13 2.5,-10 1.5,-8 -1.5,-8" fill="white"/>
+    <!-- Bottom -->
+    <polygon points="-2.5,10 0,13 2.5,10 1.5,8 -1.5,8" fill="white"/>
+    <!-- Left -->
+    <polygon points="-10,-2.5 -13,0 -10,2.5 -8,1.5 -8,-1.5" fill="white"/>
+    <!-- Right -->
+    <polygon points="10,-2.5 13,0 10,2.5 8,1.5 8,-1.5" fill="white"/>
+  </g>
 
-  <!-- Small star at top of shield -->
-  <text x="32" y="17" font-size="5" fill="#1F2937" text-anchor="middle">★</text>
+  <!-- "CR" in the upper-right white area -->
+  <text x="41" y="22" font-size="5.5" fill="#1A1A1A" font-weight="900" font-family="serif" text-anchor="middle">CR</text>
+
+  <!-- "VdG" in the lower-left white area -->
+  <text x="23" y="48" font-size="4.5" fill="#1A1A1A" font-weight="900" font-family="serif" text-anchor="middle">VdG</text>
+
+  <!-- "VASCO" at very bottom of shield -->
+  <text x="32" y="56" font-size="4.5" fill="white" font-weight="900" font-family="sans-serif" text-anchor="middle" letter-spacing="1">VASCO</text>
 </svg>
