@@ -61,7 +61,8 @@ VICTUS_II_SEASON_ID = 17  # Summer 2024 — victus return
 # Manual awards: players confirmed present but with no recorded goals/assists
 # Format: (player_id, badge_slug, game_id, season_id, notes)
 MANUAL_AWARDS = [
-    (41, "victus", None, 9, "Confirmed present Summer 2022"),  # Mazza
+    (41, "victus",    None,  9, "Confirmed present Summer 2022"),  # Mazza
+    (31, "victus_ii", None, 17, "Played last game of Summer 2024 after injury"),  # Arthur
 ]
 
 
