@@ -53,6 +53,10 @@ BADGE_DEFS = [
     ("little_roll",    "Little Roll",    "Attempted a nutmeg in their own defensive area",                "little_roll",    "manual"),
     ("tip_toe",        "Tip Toe",        "Master of the biquinho — delicate toe-poke technique",          "tip_toe",        "manual"),
     ("friend",         "Friend",         "O que importa são os amigos que fazemos no caminho",            "friend",         "manual"),
+    ("orbit",          "Orbit",          "Kicked the ball so far NASA scientists cannot explain the physics", "orbit",       "manual"),
+    ("hunger",         "Hunger",         "The idiot never passes the ball. Ever.",                           "hunger",         "manual"),
+    ("ultimate_hunger","Ultimate Hunger", "Seriously, pass the ball man. The square button exists.",         "ultimate_hunger","manual"),
+    ("saci",           "Saci",           "Excellence in using both legs — the mischievous ambipedal trickster", "saci",       "manual"),
 ]
 for slug, name, description, icon, auto_rule in BADGE_DEFS:
     sb.table("badges").upsert({
@@ -117,6 +121,16 @@ MANUAL_AWARDS = [
     (56, "tip_toe",    None, None,  "Rafa Mattos — master of the biquinho"),
     # Friend
     (49, "friend",     None, None,  "Joao Pinto — o que importa são os amigos que fazemos no caminho"),
+    # Orbit
+    (36, "orbit",      None, None,  "Daniel Tedesco — NASA-defying shot trajectory"),
+    # Hunger (never passes)
+    (34, "hunger",     None, None,  "Kuster — never passes"),
+    (57, "hunger",     None, None,  "Matheus Waterfall — never passes"),
+    (38, "hunger",     None, None,  "Sergio Filho — never passes"),
+    # Ultimate Hunger (Kuster only)
+    (34, "ultimate_hunger", None, None, "Kuster — the square button is the only button"),
+    # Saci
+    (42, "saci",       None, None,  "Caio Scofield — ambipedal excellence"),
 ]
 
 # ── Name → player_id alias map for card parsing ───────────────────────────────

@@ -99,6 +99,10 @@ const BADGE_SHORT_LABEL: Record<string, string> = {
   little_roll:       'Little Roll',
   tip_toe:           'Tip Toe',
   friend:            'Friend',
+  orbit:             'Orbit',
+  hunger:            'Hunger',
+  ultimate_hunger:   'Ultimate Hunger',
+  saci:              'Saci',
 }
 
 function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {

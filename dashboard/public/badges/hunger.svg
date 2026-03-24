@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Hunger — ball on a dinner plate, never passes -->
+  <circle cx="32" cy="32" r="30" fill="#7C2D12" stroke="#6B1A0A" stroke-width="2.5"/>
+
+  <!-- Plate -->
+  <ellipse cx="32" cy="42" rx="20" ry="6" fill="#E5E7EB"/>
+  <ellipse cx="32" cy="40" rx="18" ry="5" fill="white"/>
+  <ellipse cx="32" cy="40" rx="14" ry="4" fill="#F3F4F6"/>
+
+  <!-- Soccer ball on the plate -->
+  <circle cx="32" cy="34" r="9" fill="white" stroke="#374151" stroke-width="0.8"/>
+  <path d="M32,25 L29,28 L30,34 L34,34 L35,28 Z" fill="#1F2937"/>
+  <path d="M23,31 L29,28 L30,34" fill="none" stroke="#1F2937" stroke-width="0.8"/>
+  <path d="M41,31 L35,28 L34,34" fill="none" stroke="#1F2937" stroke-width="0.8"/>
+  <path d="M24,37 L30,34 L30,34" fill="none" stroke="#1F2937" stroke-width="0.8"/>
+  <path d="M40,37 L34,34" fill="none" stroke="#1F2937" stroke-width="0.8"/>
+
+  <!-- Fork (left) -->
+  <rect x="10" y="26" width="2" height="18" rx="1" fill="#9CA3AF"/>
+  <line x1="9"  y1="26" x2="9"  y2="20" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="11" y1="26" x2="11" y2="20" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="13" y1="26" x2="13" y2="20" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Knife (right) -->
+  <rect x="52" y="20" width="2.5" height="22" rx="1" fill="#9CA3AF"/>
+  <path d="M52,20 Q56,24 54.5,28 L52,28 Z" fill="#D1D5DB"/>
+
+  <!-- Steam from hot meal -->
+  <path d="M26,22 Q24,18 26,14" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+  <path d="M32,20 Q30,16 32,12" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+  <path d="M38,22 Q36,18 38,14" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+</svg>
