@@ -453,6 +453,7 @@ export type DivisionStanding = {
 export type TeamProjection = {
   team: string
   projPosMedian: number   // 50th percentile
+  projPosMean:   number   // weighted average — used for tie-breaking
   projPos25:     number   // 25th percentile (better)
   projPos75:     number   // 75th percentile (worse)
   probTop3:      number   // 0–100
@@ -694,15 +695,19 @@ export async function getSeasonProjection(league = 'brazuka'): Promise<TeamProje
       if (pos > n - 3)  probBottom3 += counts[pos]
     }
 
+    let posSum = 0
+    for (let pos = 1; pos <= n; pos++) posSum += pos * counts[pos]
+
     return {
       team,
       projPosMedian: p50,
+      projPosMean:   posSum / SIMS,
       projPos25:     p25,
       projPos75:     p75,
       probTop3:      Math.round(probTop3    / SIMS * 100),
       probBottom3:   Math.round(probBottom3 / SIMS * 100),
     }
-  }).sort((a, b) => a.projPosMedian - b.projPosMedian || a.projPos25 - b.projPos25)
+  }).sort((a, b) => a.projPosMean - b.projPosMean)
 }
 
 export async function getTopOpponents(teamId: number, seasonId?: number) {

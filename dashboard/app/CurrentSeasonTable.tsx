@@ -20,21 +20,24 @@ function GdCell({ gd }: { gd: number }) {
   return <span className={`tabular-nums font-medium ${color}`}>{gd > 0 ? `+${gd}` : gd}</span>
 }
 
-function ProjCell({ proj, n }: { proj: TeamProjection | undefined; n: number }) {
-  if (!proj) return <span className="text-gray-300">—</span>
-  const { projPosMedian: pos } = proj
-
-  const top3    = pos <= 3
-  const bottom3 = pos > n - 3
+function ProjCell({ rank, proj, n }: { rank: number; proj: TeamProjection; n: number }) {
+  const { probTop3, probBottom3 } = proj
+  const top3    = rank <= 3
+  const bottom3 = rank > n - 3
   const colorCls = top3    ? 'bg-[#009C3B]/10 text-[#009C3B] border-[#009C3B]/20'
                  : bottom3 ? 'bg-red-50 text-red-500 border-red-200'
                  :           'bg-gray-100 text-gray-500 border-gray-200'
-  const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : null
+  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null
+
+  const tooltip = `Top 3: ${probTop3}% · Bottom 3: ${probBottom3}%`
 
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-bold tabular-nums ${colorCls}`}>
+    <span
+      title={tooltip}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-bold tabular-nums cursor-default ${colorCls}`}
+    >
       {medal && <span className="text-[11px]">{medal}</span>}
-      {pos}<span className="font-normal opacity-50">/{n}</span>
+      {rank}<span className="font-normal opacity-50">/{n}</span>
     </span>
   )
 }
@@ -50,7 +53,10 @@ export default function CurrentSeasonTable({
 }) {
   if (standings.length === 0) return null
 
-  const projMap = new Map(projections.map(p => [p.team, p]))
+  // Assign unique projected ranks by sorting on mean (continuous — never ties exactly)
+  const sortedProj = [...projections].sort((a, b) => a.projPosMean - b.projPosMean)
+  const projRank = new Map(sortedProj.map((p, i) => [p.team, i + 1]))
+  const projMap  = new Map(projections.map(p => [p.team, p]))
   const n = standings[0].totalTeams
   const seasonName = standings[0].seasonName
 
@@ -106,7 +112,9 @@ export default function CurrentSeasonTable({
                   <td className="px-2 py-3 text-center"><GdCell gd={s.gd} /></td>
                   <td className="px-2 py-3 text-center font-black text-[#002776] tabular-nums">{s.pts}</td>
                   <td className="px-3 py-3 text-right">
-                    <ProjCell proj={proj} n={n} />
+                    {proj && projRank.has(s.team)
+                      ? <ProjCell rank={projRank.get(s.team)!} proj={proj} n={n} />
+                      : <span className="text-gray-300">—</span>}
                   </td>
                 </tr>
               )
