@@ -76,7 +76,7 @@ MANUAL_AWARDS = [
 CARD_NAME_ALIASES = {
     "Guilherme Kuster": 34,   # canonical: Kuster
     "Pablo Rodrigues":  37,   # canonical: Pablo
-    "Roberto Machado":  None, # not in DB — skip
+    "Roberto Machado":  46,   # Bobby Axe
 }
 
 def name_to_player_id(name, players):
