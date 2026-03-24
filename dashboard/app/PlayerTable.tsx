@@ -103,6 +103,7 @@ const BADGE_SHORT_LABEL: Record<string, string> = {
   hunger:            'Hunger',
   ultimate_hunger:   'Ultimate Hunger',
   saci:              'Saci',
+  glass_bones:       'Glass Bones',
 }
 
 function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {

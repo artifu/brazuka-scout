@@ -57,6 +57,7 @@ BADGE_DEFS = [
     ("hunger",         "Hunger",         "The idiot never passes the ball. Ever.",                           "hunger",         "manual"),
     ("ultimate_hunger","Ultimate Hunger", "Seriously, pass the ball man. The square button exists.",         "ultimate_hunger","manual"),
     ("saci",           "Saci",           "Excellence in using both legs — the mischievous ambipedal trickster", "saci",       "manual"),
+    ("glass_bones",    "Glass Bones",    "Showing great body resistance to impacts",                          "glass_bones", "manual"),
 ]
 for slug, name, description, icon, auto_rule in BADGE_DEFS:
     sb.table("badges").upsert({
@@ -131,6 +132,8 @@ MANUAL_AWARDS = [
     (34, "ultimate_hunger", None, None, "Kuster — the square button is the only button"),
     # Saci
     (42, "saci",       None, None,  "Caio Scofield — ambipedal excellence"),
+    # Glass Bones
+    (39, "glass_bones", None, None, "Pedro Nakamura — great body resistance to impacts"),
 ]
 
 # ── Name → player_id alias map for card parsing ───────────────────────────────
