@@ -38,7 +38,8 @@ BADGE_DEFS = [
     ("champ_winter2_2024", "Winter II 2024 Champion", "Division champion — Winter II 2024",          "champ_winter2_2024",  "season"),
     ("champ_spring_2025",  "Spring 2025 Champion",    "Division champion — Spring 2025",             "champ_spring_2025",   "season"),
     ("champ_summer_2025",  "Summer 2025 Champion",    "Division champion — Summer 2025 (perfect season)", "champ_summer_2025", "season"),
-    ("victus",           "Victus",               "Survived Summer 2024 — 0 wins, all heart",          "victus",           "season"),
+    ("victus",    "Victus",    "Survived Summer 2022 — the original 0-win shame season",  "victus",    "season"),
+    ("victus_ii", "Victus II", "Survived Summer 2024 — 0 wins, they came back for more", "victus_ii", "season"),
 ]
 for slug, name, description, icon, auto_rule in BADGE_DEFS:
     sb.table("badges").upsert({
@@ -54,7 +55,14 @@ CHAMPION_SEASONS = [
     (24, "champ_spring_2025",  "Spring 2025 Champion"),
     (23, "champ_summer_2025",  "Summer 2025 Champion"),
 ]
-VICTUS_SEASON_ID = 17  # Summer 2024 — 0 wins
+VICTUS_SEASON_ID    =  9  # Summer 2022 — original 0-win shame season
+VICTUS_II_SEASON_ID = 17  # Summer 2024 — victus return
+
+# Manual awards: players confirmed present but with no recorded goals/assists
+# Format: (player_id, badge_slug, game_id, season_id, notes)
+MANUAL_AWARDS = [
+    (41, "victus", None, 9, "Confirmed present Summer 2022"),  # Mazza
+]
 
 
 def award_game(badge_slug, rows, label):
@@ -144,7 +152,30 @@ for season_id, slug, label in CHAMPION_SEASONS:
     a, s = award_season(slug, season_id, label)
     total_awarded += a; total_skipped += s
 
-a, s = award_season("victus", VICTUS_SEASON_ID, "Victus (Summer 2024 shame season)")
+# Clean up wrongly-assigned victus records (were Summer 2024, should be victus_ii)
+sb.table("player_badges").delete().eq("badge_slug", "victus").eq("season_id", VICTUS_II_SEASON_ID).execute()
+print("Cleaned up mis-assigned victus records (season_id=17 → now victus_ii)")
+
+a, s = award_season("victus",    VICTUS_SEASON_ID,    "Victus (Summer 2022 — original shame season)")
 total_awarded += a; total_skipped += s
+
+a, s = award_season("victus_ii", VICTUS_II_SEASON_ID, "Victus II (Summer 2024 — they came back for more)")
+total_awarded += a; total_skipped += s
+
+# ── Manual awards ─────────────────────────────────────────────────────────────
+print("Applying manual awards...")
+for player_id, badge_slug, game_id, season_id, notes in MANUAL_AWARDS:
+    try:
+        sb.table("player_badges").insert({
+            "player_id": player_id, "badge_slug": badge_slug,
+            "game_id": game_id, "season_id": season_id, "notes": notes,
+        }).execute()
+        total_awarded += 1
+        print(f"  ✓ Manual: player_id={player_id} badge={badge_slug} ({notes})")
+    except Exception as e:
+        if "duplicate" in str(e).lower() or "unique" in str(e).lower():
+            total_skipped += 1
+        else:
+            print(f"  ERROR player_id={player_id}: {e}")
 
 print(f"\nAll done — {total_awarded} new badges awarded, {total_skipped} already existed.")
