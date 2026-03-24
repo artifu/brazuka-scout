@@ -86,6 +86,10 @@ const BADGE_SHORT_LABEL: Record<string, string> = {
   champ_summer_2025:  '4th Title',
   victus:            'Victus',
   victus_ii:         'Victus II',
+  yellow_card:       'Yellow Card',
+  blue_card:         'Blue Card',
+  injury:            'Tipo Ronaldo',
+  love_doping:       'Love Doping',
 }
 
 function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {

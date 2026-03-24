@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Yellow card badge -->
+  <circle cx="32" cy="32" r="30" fill="#1F2937" stroke="#111827" stroke-width="2.5"/>
+  <!-- Referee arm/hand -->
+  <rect x="28" y="38" width="10" height="16" rx="4" fill="#C4855A"/>
+  <ellipse cx="33" cy="54" rx="7" ry="4" fill="#C4855A"/>
+  <!-- Yellow card at angle -->
+  <rect x="18" y="10" width="22" height="30" rx="3" fill="#FBBF24" transform="rotate(10 29 25)"/>
+  <!-- Card shine -->
+  <rect x="20" y="12" width="5" height="26" rx="2" fill="#FDE68A" opacity="0.4" transform="rotate(10 22 25)"/>
+</svg>

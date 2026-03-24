@@ -38,8 +38,12 @@ BADGE_DEFS = [
     ("champ_winter2_2024", "Winter II 2024 Champion", "Division champion — Winter II 2024",          "champ_winter2_2024",  "season"),
     ("champ_spring_2025",  "Spring 2025 Champion",    "Division champion — Spring 2025",             "champ_spring_2025",   "season"),
     ("champ_summer_2025",  "Summer 2025 Champion",    "Division champion — Summer 2025 (perfect season)", "champ_summer_2025", "season"),
-    ("victus",    "Victus",    "Survived Summer 2022 — the original 0-win shame season",  "victus",    "season"),
-    ("victus_ii", "Victus II", "Survived Summer 2024 — 0 wins, they came back for more", "victus_ii", "season"),
+    ("victus",      "Victus",       "Survived Summer 2022 — the original 0-win shame season",    "victus",      "season"),
+    ("victus_ii",   "Victus II",    "Survived Summer 2024 — 0 wins, they came back for more",   "victus_ii",   "season"),
+    ("yellow_card", "Yellow Card",  "Received a yellow card",                                    "yellow_card", "manual"),
+    ("blue_card",   "Blue Card",    "Received a blue card (2-minute suspension)",                "blue_card",   "manual"),
+    ("injury",      "Tipo Ronaldo", "Suffered a significant injury mid-season",                  "injury",      "manual"),
+    ("love_doping", "Love Doping",  "Performs substantially better when loved ones are watching","love_doping", "manual"),
 ]
 for slug, name, description, icon, auto_rule in BADGE_DEFS:
     sb.table("badges").upsert({
@@ -61,9 +65,88 @@ VICTUS_II_SEASON_ID = 17  # Summer 2024 — victus return
 # Manual awards: players confirmed present but with no recorded goals/assists
 # Format: (player_id, badge_slug, game_id, season_id, notes)
 MANUAL_AWARDS = [
-    (41, "victus",    None,  9, "Confirmed present Summer 2022"),  # Mazza
-    (31, "victus_ii", None, 17, "Played last game of Summer 2024 after injury"),  # Arthur
+    (41, "victus",      None,  9,    "Confirmed present Summer 2022"),            # Mazza
+    (31, "victus_ii",   None, 17,    "Played last game of Summer 2024 after injury"),  # Arthur
+    (61, "injury",      None, None,  "Lucas Guilherme — serious knee injury"),    # Lucas Guilherme
+    (55, "love_doping", None, None,  "Alexis (keeper) — performs better when loved ones watch"),  # Alexis
 ]
+
+# ── Name → player_id alias map for card parsing ───────────────────────────────
+# Covers names that appear in yellow_cards column but differ from canonical_name
+CARD_NAME_ALIASES = {
+    "Guilherme Kuster": 34,   # canonical: Kuster
+    "Pablo Rodrigues":  37,   # canonical: Pablo
+    "Roberto Machado":  None, # not in DB — skip
+}
+
+def name_to_player_id(name, players):
+    """Match a raw name from yellow_cards to a player_id."""
+    name = name.strip()
+    if name in CARD_NAME_ALIASES:
+        return CARD_NAME_ALIASES[name]
+    # Exact match on canonical_name or display_name
+    for p in players:
+        if p["canonical_name"] == name or p.get("display_name") == name:
+            return p["id"]
+    # Partial: canonical_name starts with name (handles "Kuster" matching "Guilherme Kuster" etc.)
+    name_lower = name.lower()
+    for p in players:
+        canon = (p["canonical_name"] or "").lower()
+        display = (p.get("display_name") or "").lower()
+        if canon == name_lower or display == name_lower:
+            return p["id"]
+        # Check if any word in canonical matches a word in name
+        canon_words = set(canon.split())
+        name_words  = set(name_lower.split())
+        if canon_words & name_words and len(canon_words & name_words) >= min(len(canon_words), len(name_words)):
+            return p["id"]
+    return None
+
+
+def award_cards(players):
+    """Parse yellow_cards column from games; award yellow_card or blue_card badges."""
+    awarded = skipped = 0
+    print("Checking card badges...")
+    games_r = sb.table("games").select("id, yellow_cards").eq("team_id", 1).execute()
+    unmatched: set[str] = set()
+    for game in games_r.data:
+        cards = game.get("yellow_cards") or []
+        game_id = game["id"]
+        for entry in cards:
+            entry = entry.strip()
+            if not entry:
+                continue
+            # Determine card type
+            if "(azul)" in entry.lower():
+                slug = "blue_card"
+                raw_name = entry.replace("(azul)", "").replace("(Azul)", "").strip()
+            elif "(vermelho)" in entry.lower():
+                # Red cards — skip for now (no badge yet)
+                continue
+            else:
+                slug = "yellow_card"
+                raw_name = entry
+            pid = name_to_player_id(raw_name, players)
+            if pid is None:
+                unmatched.add(raw_name)
+                continue
+            try:
+                sb.table("player_badges").insert({
+                    "player_id": pid,
+                    "badge_slug": slug,
+                    "game_id":    game_id,
+                }).execute()
+                awarded += 1
+                print(f"  ✓ {slug} → player_id={pid} ({raw_name}) game_id={game_id}")
+            except Exception as e:
+                if "duplicate" in str(e).lower() or "unique" in str(e).lower():
+                    skipped += 1
+                else:
+                    print(f"  ERROR player_id={pid} ({raw_name}) game_id={game_id}: {e}")
+    if unmatched:
+        print(f"  ⚠ Unmatched names (no player_id found): {sorted(unmatched)}")
+    print(f"  → {awarded} new, {skipped} already existed.")
+    return awarded, skipped
 
 
 def award_game(badge_slug, rows, label):
@@ -127,6 +210,9 @@ def award_season(badge_slug, season_id, label):
 
 total_awarded = total_skipped = 0
 
+# Load all players once for name matching
+all_players = sb.table("players").select("id, canonical_name, display_name").execute().data
+
 # ── Game badges ───────────────────────────────────────────────────────────────
 r = sb.table("goals").select("player_id, game_id, count") \
     .eq("own_goal", False).gte("count", 3).not_.is_("player_id", "null").execute()
@@ -146,6 +232,10 @@ total_awarded += a; total_skipped += s
 r = sb.table("assists").select("player_id, game_id, count") \
     .not_.is_("player_id", "null").gte("count", 3).execute()
 a, s = award_game("garcom", r.data, "Garçom (3+ assists)")
+total_awarded += a; total_skipped += s
+
+# ── Card badges ────────────────────────────────────────────────────────────────
+a, s = award_cards(all_players)
 total_awarded += a; total_skipped += s
 
 # ── Season badges ─────────────────────────────────────────────────────────────
