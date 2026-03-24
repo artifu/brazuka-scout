@@ -43,7 +43,16 @@ BADGE_DEFS = [
     ("yellow_card", "Yellow Card",  "Received a yellow card",                                    "yellow_card", "manual"),
     ("blue_card",   "Blue Card",    "Received a blue card (2-minute suspension)",                "blue_card",   "manual"),
     ("injury",      "Tipo Ronaldo", "Suffered a significant injury mid-season",                  "injury",      "manual"),
-    ("love_doping", "Love Doping",  "Performs substantially better when loved ones are watching","love_doping", "manual"),
+    ("love_doping",    "Love Doping",    "Performs substantially better when loved ones are watching",    "love_doping",    "manual"),
+    ("rat_trick",      "Rat Trick",      "Hattrick scored by Rat Franco — far harder than a regular one", "rat_trick",      "manual"),
+    ("sitter_misser",  "Sitter Misser",  "Missed an unbelievable open goal",                              "sitter_misser",  "manual"),
+    ("shoot_fofo",     "Shoot Fofo",     "Shoots with the force of a fluffy bedroom slipper",             "shoot_fofo",     "manual"),
+    ("stylish_shorts", "Stylish Shorts", "Awarded for wearing the most fashionable shorts on the pitch",  "stylish_shorts", "manual"),
+    ("sleepy_gus",     "Sleepy Gus",     "Consistently found napping on the pitch mid-game",              "sleepy_gus",     "manual"),
+    ("cordiality",     "Cordiality",     "Never complains — the most civil player on the pitch",          "cordiality",     "manual"),
+    ("little_roll",    "Little Roll",    "Attempted a nutmeg in their own defensive area",                "little_roll",    "manual"),
+    ("tip_toe",        "Tip Toe",        "Master of the biquinho — delicate toe-poke technique",          "tip_toe",        "manual"),
+    ("friend",         "Friend",         "O que importa são os amigos que fazemos no caminho",            "friend",         "manual"),
 ]
 for slug, name, description, icon, auto_rule in BADGE_DEFS:
     sb.table("badges").upsert({
@@ -67,8 +76,47 @@ VICTUS_II_SEASON_ID = 17  # Summer 2024 — victus return
 MANUAL_AWARDS = [
     (41, "victus",      None,  9,    "Confirmed present Summer 2022"),            # Mazza
     (31, "victus_ii",   None, 17,    "Played last game of Summer 2024 after injury"),  # Arthur
-    (61, "injury",      None, None,  "Lucas Guilherme — serious knee injury"),    # Lucas Guilherme
-    (55, "love_doping", None, None,  "Alexis (keeper) — performs better when loved ones watch"),  # Alexis
+    (61, "injury",      None, None,  "Lucas Guilherme — serious knee injury"),
+    (55, "love_doping", None, None,  "Alexis (keeper) — performs better when loved ones watch"),
+    # Rat Trick — Rafa Franco hattricks (game_ids confirmed from goals table)
+    (33, "rat_trick",   143,  None,  "Rat Franco hattrick"),
+    (33, "rat_trick",   178,  None,  "Rat Franco hattrick"),
+    (33, "rat_trick",   198,  None,  "Rat Franco hattrick"),
+    # Sitter Misser — Rafa Franco x6
+    (33, "sitter_misser",   2, None,  "Classic sitter miss"),
+    (33, "sitter_misser", 135, None,  "Classic sitter miss"),
+    (33, "sitter_misser", 136, None,  "Classic sitter miss"),
+    (33, "sitter_misser", 137, None,  "Classic sitter miss"),
+    (33, "sitter_misser", 122, None,  "Classic sitter miss"),
+    (33, "sitter_misser", 138, None,  "Classic sitter miss"),
+    # Sitter Misser — Mazza x6
+    (41, "sitter_misser", 136, None,  "Classic Mazza sitter"),
+    (41, "sitter_misser", 137, None,  "Classic Mazza sitter"),
+    (41, "sitter_misser", 138, None,  "Classic Mazza sitter"),
+    (41, "sitter_misser", 177, None,  "Classic Mazza sitter"),
+    (41, "sitter_misser", 242, None,  "Classic Mazza sitter"),
+    (41, "sitter_misser", 254, None,  "Classic Mazza sitter"),
+    # Shoot Fofo
+    (36, "shoot_fofo",  None, None,  "Daniel Tedesco — fluffy shots"),
+    (80, "shoot_fofo",  None, None,  "Axel — fluffy shots"),
+    # Stylish Shorts
+    (37, "stylish_shorts", None, None,  "Pablo — most stylish fashion shorts"),
+    # Sleepy Gus
+    (62, "sleepy_gus",  None, None,  "Gustavo Bittencourt — sleeping on the pitch"),
+    # Cordiality — Cleiton Castro x5
+    (50, "cordiality", 204, None,  "Never complained"),
+    (50, "cordiality", 205, None,  "Never complained"),
+    (50, "cordiality", 207, None,  "Never complained"),
+    (50, "cordiality", 195, None,  "Never complained"),
+    (50, "cordiality", 197, None,  "Never complained"),
+    # Little Roll
+    (48, "little_roll", None, None,  "Joao Barros — nutmeg in defensive area"),
+    (49, "little_roll", None, None,  "Joao Pinto — nutmeg in defensive area"),
+    (50, "little_roll", None, None,  "Cleiton Castro — nutmeg in defensive area"),
+    # Tip Toe
+    (56, "tip_toe",    None, None,  "Rafa Mattos — master of the biquinho"),
+    # Friend
+    (49, "friend",     None, None,  "Joao Pinto — o que importa são os amigos que fazemos no caminho"),
 ]
 
 # ── Name → player_id alias map for card parsing ───────────────────────────────

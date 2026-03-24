@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Rat Trick — rat with soccer ball -->
+  <circle cx="32" cy="32" r="30" fill="#1F2937" stroke="#111827" stroke-width="2.5"/>
+
+  <!-- Tail curling behind -->
+  <path d="M40,50 Q52,52 54,44 Q56,36 50,34" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Body -->
+  <ellipse cx="32" cy="44" rx="14" ry="10" fill="#6B7280"/>
+
+  <!-- Soccer ball under paws -->
+  <circle cx="32" cy="53" r="7" fill="white" stroke="#374151" stroke-width="0.8"/>
+  <path d="M32,46 L29,49 L30,53 L34,53 L35,49 Z" fill="#1F2937"/>
+  <path d="M25,50 L29,49 L30,53 L27,55" fill="none" stroke="#1F2937" stroke-width="0.8"/>
+  <path d="M39,50 L35,49 L34,53 L37,55" fill="none" stroke="#1F2937" stroke-width="0.8"/>
+
+  <!-- Head -->
+  <ellipse cx="32" cy="32" rx="11" ry="10" fill="#6B7280"/>
+
+  <!-- Big ears -->
+  <ellipse cx="22" cy="24" rx="6" ry="7" fill="#6B7280"/>
+  <ellipse cx="22" cy="24" rx="4" ry="5" fill="#F9A8D4"/>
+  <ellipse cx="42" cy="24" rx="6" ry="7" fill="#6B7280"/>
+  <ellipse cx="42" cy="24" rx="4" ry="5" fill="#F9A8D4"/>
+
+  <!-- Eyes — beady red rat eyes -->
+  <circle cx="27" cy="31" r="2.5" fill="#EF4444"/>
+  <circle cx="37" cy="31" r="2.5" fill="#EF4444"/>
+  <circle cx="27.5" cy="31.5" r="1" fill="#7F1D1D"/>
+  <circle cx="37.5" cy="31.5" r="1" fill="#7F1D1D"/>
+
+  <!-- Snout -->
+  <ellipse cx="32" cy="36" rx="4" ry="3" fill="#9CA3AF"/>
+  <circle cx="32" cy="35" r="1.2" fill="#1F2937"/>
+
+  <!-- Whiskers -->
+  <line x1="36" y1="35" x2="46" y2="33" stroke="#D1D5DB" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="36" y1="36" x2="46" y2="36" stroke="#D1D5DB" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="28" y1="35" x2="18" y2="33" stroke="#D1D5DB" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="28" y1="36" x2="18" y2="36" stroke="#D1D5DB" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Tiny paws on ball -->
+  <ellipse cx="26" cy="49" rx="3" ry="2" fill="#9CA3AF"/>
+  <ellipse cx="38" cy="49" rx="3" ry="2" fill="#9CA3AF"/>
+</svg>

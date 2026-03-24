@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Cordiality — not complaining, peaceful gentleman -->
+  <circle cx="32" cy="32" r="30" fill="#064E3B" stroke="#065F46" stroke-width="2.5"/>
+
+  <!-- Dove / peace bird -->
+  <ellipse cx="32" cy="30" rx="10" ry="7" fill="white"/>
+  <!-- Wing left -->
+  <path d="M22,30 Q14,22 18,18 Q24,22 22,30 Z" fill="white"/>
+  <!-- Wing right -->
+  <path d="M42,30 Q50,22 46,18 Q40,22 42,30 Z" fill="white"/>
+  <!-- Head -->
+  <circle cx="32" cy="22" r="6" fill="white"/>
+  <!-- Beak -->
+  <path d="M32,22 L38,20 L36,23 Z" fill="#F59E0B"/>
+  <!-- Eye -->
+  <circle cx="30" cy="21" r="1.5" fill="#1F2937"/>
+  <!-- Tail -->
+  <path d="M28,36 Q32,42 36,36" fill="white"/>
+
+  <!-- Olive branch in beak -->
+  <path d="M36,21 Q42,16 46,12" fill="none" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="40" cy="17" rx="3" ry="2" fill="#16A34A" transform="rotate(-30 40 17)"/>
+  <ellipse cx="44" cy="14" rx="2.5" ry="1.5" fill="#16A34A" transform="rotate(-20 44 14)"/>
+  <ellipse cx="46" cy="12" rx="2" ry="1.3" fill="#22C55E" transform="rotate(-10 46 12)"/>
+
+  <!-- Thumbs up below -->
+  <text x="27" y="55" font-size="14">👍</text>
+</svg>

@@ -90,6 +90,15 @@ const BADGE_SHORT_LABEL: Record<string, string> = {
   blue_card:         'Blue Card',
   injury:            'Tipo Ronaldo',
   love_doping:       'Love Doping',
+  rat_trick:         'Rat Trick',
+  sitter_misser:     'Sitter Misser',
+  shoot_fofo:        'Shoot Fofo',
+  stylish_shorts:    'Stylish Shorts',
+  sleepy_gus:        'Sleepy Gus',
+  cordiality:        'Cordiality',
+  little_roll:       'Little Roll',
+  tip_toe:           'Tip Toe',
+  friend:            'Friend',
 }
 
 function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {

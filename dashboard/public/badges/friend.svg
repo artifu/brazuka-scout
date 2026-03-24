@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Friend — o que importa são os amigos que fazemos no caminho -->
+  <circle cx="32" cy="32" r="30" fill="#7E22CE" stroke="#6B21A8" stroke-width="2.5"/>
+
+  <!-- Two figures holding hands -->
+  <!-- Left person -->
+  <circle cx="18" cy="20" r="5" fill="#FDE68A"/>
+  <rect x="14" y="25" width="8" height="10" rx="3" fill="#F59E0B"/>
+  <line x1="18" y1="30" x2="18" y2="42" stroke="#C4855A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="18" y1="42" x2="14" y2="50" stroke="#C4855A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="18" y1="42" x2="22" y2="50" stroke="#C4855A" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Right person -->
+  <circle cx="46" cy="20" r="5" fill="#FDE68A"/>
+  <rect x="42" y="25" width="8" height="10" rx="3" fill="#8B5CF6"/>
+  <line x1="46" y1="30" x2="46" y2="42" stroke="#C4855A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="46" y1="42" x2="42" y2="50" stroke="#C4855A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="46" y1="42" x2="50" y2="50" stroke="#C4855A" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Arms reaching toward each other -->
+  <line x1="22" y1="28" x2="29" y2="34" stroke="#C4855A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="42" y1="28" x2="35" y2="34" stroke="#C4855A" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Heart between them -->
+  <path d="M29,31 Q29,27 32,29 Q35,27 35,31 Q35,35 32,37 Q29,35 29,31 Z" fill="#EC4899"/>
+  <path d="M30,31 Q30,28 32,30 Q34,28 34,31 Q34,34 32,36 Q30,34 30,31 Z" fill="#F9A8D4"/>
+
+  <!-- Stars of friendship -->
+  <text x="9" y="14" font-size="6" fill="#FDE68A">★</text>
+  <text x="49" y="14" font-size="6" fill="#FDE68A">★</text>
+</svg>
