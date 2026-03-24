@@ -90,7 +90,7 @@ function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {
       {Object.entries(grouped).map(([slug, { icon, name, description, count }]) => (
         <div key={slug} className="relative group">
           <div className="flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-lg cursor-default select-none hover:bg-amber-100 transition-colors">
-            <span className="text-lg leading-none">{icon}</span>
+            <img src={`/badges/${slug}.svg`} alt={name} className="w-7 h-7" />
             {count > 1 && (
               <span className="text-[10px] font-black text-amber-700 tabular-nums">×{count}</span>
             )}
@@ -98,7 +98,7 @@ function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {
           {/* Tooltip — fixed-width, opens upward, won't clip */}
           <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[9999] opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-48">
             <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-xl">
-              <p className="font-bold leading-snug">{icon} {name}{count > 1 ? ` ×${count}` : ''}</p>
+              <p className="font-bold leading-snug">{name}{count > 1 ? ` ×${count}` : ''}</p>
               <p className="text-gray-300 mt-1 leading-snug">{description}</p>
             </div>
             <div className="w-2 h-2 bg-gray-900 rotate-45 mx-auto -mt-1" />
@@ -220,15 +220,12 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
                 <tr
                   key={p.player}
                   onClick={() => toggleExpand(p.playerId)}
-                  className={`${!isExpanded && !isLast ? 'border-b border-gray-100' : ''} ${p.playerId !== null ? 'cursor-pointer hover:bg-gray-50' : ''} ${isExpanded ? 'bg-gray-50' : ''} transition-colors`}
+                  className={`${!isExpanded && !isLast ? 'border-b border-gray-100' : ''} ${p.playerId !== null ? 'cursor-pointer hover:bg-gray-50 group' : ''} ${isExpanded ? 'bg-gray-50' : ''} transition-colors`}
                 >
                   <td className="px-5 py-3 text-gray-400 text-xs tabular-nums text-right">{medal(i) ?? i + 1}</td>
-                  <td className="px-3 py-3 font-medium text-gray-800">
-                    <span className="flex items-center gap-1.5">
+                  <td className={`py-3 font-medium transition-all ${isExpanded ? 'pl-[10px] pr-3 border-l-2 border-[#009C3B]' : 'px-3 border-l-2 border-transparent'}`}>
+                    <span className={`${isExpanded ? 'text-[#009C3B]' : 'text-gray-800'} ${p.playerId !== null ? 'group-hover:underline underline-offset-2 decoration-dotted decoration-gray-400' : ''}`}>
                       {p.player}
-                      {p.playerId !== null && (
-                        <span className={`text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180 text-[#009C3B]' : 'text-gray-300'}`}>▼</span>
-                      )}
                     </span>
                   </td>
                   <td className={`px-3 py-3 text-center tabular-nums font-bold ${sortKey === 'goals' ? 'text-[#009C3B]' : 'text-gray-600'}`}>{p.goals}</td>

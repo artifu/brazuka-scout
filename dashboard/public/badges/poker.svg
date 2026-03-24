@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Silver: slate background -->
+  <circle cx="32" cy="32" r="30" fill="#64748B"/>
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#334155" stroke-width="2.5"/>
+  <!-- Card shape -->
+  <rect x="16" y="12" width="32" height="40" rx="4" fill="white"/>
+  <!-- Red suits (top-left + bottom-right) -->
+  <text x="22" y="28" text-anchor="middle" font-family="Georgia, serif" font-size="14" fill="#DC2626">♥</text>
+  <text x="42" y="52" text-anchor="middle" font-family="Georgia, serif" font-size="14" fill="#DC2626" transform="rotate(180 42 45)">♥</text>
+  <!-- Black suits (top-right + bottom-left) -->
+  <text x="42" y="28" text-anchor="middle" font-family="Georgia, serif" font-size="14" fill="#1E293B">♠</text>
+  <text x="22" y="52" text-anchor="middle" font-family="Georgia, serif" font-size="14" fill="#1E293B" transform="rotate(180 22 45)">♠</text>
+  <!-- Center large suit -->
+  <text x="32" y="40" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#DC2626">♦</text>
+</svg>

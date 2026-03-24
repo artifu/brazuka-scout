@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Bronze: amber background -->
+  <circle cx="32" cy="32" r="30" fill="#F59E0B"/>
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#92400E" stroke-width="2.5"/>
+  <!-- Hat brim -->
+  <rect x="13" y="37" width="38" height="7" rx="3.5" fill="white"/>
+  <!-- Hat cylinder -->
+  <rect x="21" y="16" width="22" height="22" rx="2" fill="white"/>
+  <!-- Hat band -->
+  <rect x="21" y="33" width="22" height="6" fill="#92400E"/>
+  <!-- Three stars above hat (gold dots arranged as stars) -->
+  <circle cx="23" cy="11" r="3.5" fill="white"/>
+  <circle cx="32" cy="9" r="3.5" fill="white"/>
+  <circle cx="41" cy="11" r="3.5" fill="white"/>
+  <!-- Star shine on dots -->
+  <circle cx="23" cy="11" r="1.5" fill="#F59E0B"/>
+  <circle cx="32" cy="9" r="1.5" fill="#F59E0B"/>
+  <circle cx="41" cy="11" r="1.5" fill="#F59E0B"/>
+</svg>
