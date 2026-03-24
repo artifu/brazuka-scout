@@ -80,10 +80,10 @@ def award_game(badge_slug, rows, label):
 
 
 def award_season(badge_slug, season_id, label):
-    """Award a season badge to all players who appeared in that season."""
+    """Award a season badge to all players who appeared in that season.
+    Uses game_players if available, falls back to goals+assists scorers."""
     awarded = skipped = 0
     print(f"Checking {label} (season_id={season_id})...")
-    # Get all player_ids from game_players for games in this season
     games_r = sb.table("games").select("id").eq("season_id", season_id).eq("team_id", 1).execute()
     game_ids = [g["id"] for g in games_r.data]
     if not game_ids:
@@ -91,6 +91,12 @@ def award_season(badge_slug, season_id, label):
         return 0, 0
     players_r = sb.table("game_players").select("player_id").in_("game_id", game_ids).execute()
     player_ids = list({row["player_id"] for row in players_r.data if row["player_id"]})
+    if not player_ids:
+        # Fallback: use anyone who scored or assisted that season
+        goals_r   = sb.table("goals").select("player_id").in_("game_id", game_ids).not_.is_("player_id", "null").execute()
+        assists_r  = sb.table("assists").select("player_id").in_("game_id", game_ids).not_.is_("player_id", "null").execute()
+        player_ids = list({r["player_id"] for r in goals_r.data} | {r["player_id"] for r in assists_r.data})
+        print(f"  (no game_players — falling back to {len(player_ids)} scorers/assisters)")
     for pid in player_ids:
         try:
             sb.table("player_badges").insert({
