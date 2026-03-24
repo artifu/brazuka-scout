@@ -55,7 +55,7 @@ BADGE_DEFS = [
     ("friend",         "Friend",         "O que importa são os amigos que fazemos no caminho",            "friend",         "manual"),
     ("orbit",          "Orbit",          "Kicked the ball so far NASA scientists cannot explain the physics", "orbit",       "manual"),
     ("hunger",         "Hunger",         "The idiot never passes the ball. Ever.",                           "hunger",         "manual"),
-    ("famine",         "Famine",          "The pass button exists. That one only shoots.",                    "famine",         "manual"),
+    ("famine",         "Famine",          "Seriously man, pass the ball. You dont need to shoot every single ball.", "famine",    "manual"),
     ("saci",           "Saci",           "Excellence in using both legs — the mischievous ambipedal trickster", "saci",       "manual"),
     ("glass_bones",    "Glass Bones",    "Showing great body resistance to impacts",                          "glass_bones", "manual"),
 ]
