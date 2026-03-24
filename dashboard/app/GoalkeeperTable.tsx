@@ -45,6 +45,7 @@ const BADGE_SHORT_LABEL: Record<string, string> = {
   famine:             'Famine',
   saci:               'Saci',
   glass_bones:        'Glass Bones',
+  chapada:            'Chapada',
 }
 
 function StatPill({ label, value, highlight }: { label: string; value: string | number; highlight?: boolean }) {
