@@ -484,6 +484,65 @@ export async function getCurrentSeasonStandings(league = 'brazuka'): Promise<Div
     .map((s, i) => ({ team: s.team, pos: i + 1, mp: s.mp, pts: s.pts, totalTeams, seasonName }))
 }
 
+export type PlayerBadge = {
+  slug: string; name: string; description: string; icon: string
+  gameId: number | null; notes: string | null
+}
+
+export type WithWithoutStats = {
+  mp: number; wins: number; draws: number; losses: number
+  gf: number; ga: number
+  winPct: number; gfPerGame: number; gaPerGame: number
+}
+
+export type PlayerProfile = {
+  withStats:    WithWithoutStats | null
+  withoutStats: WithWithoutStats | null
+  badges:       PlayerBadge[]
+}
+
+export async function getPlayerProfile(playerId: number, teamId = 1): Promise<PlayerProfile> {
+  const [{ data: allGames }, { data: gpRows }, { data: appRows }, { data: badgeRows }] = await Promise.all([
+    supabase.from('games').select('id, result, score_brazuka, score_opponent').eq('team_id', teamId).not('result', 'is', null).limit(2000),
+    supabase.from('game_players').select('game_id').eq('player_id', playerId).eq('team_id', teamId).limit(2000),
+    supabase.from('appearances').select('game_id').eq('player_id', playerId).limit(2000),
+    supabase.from('player_badges').select('badge_slug, game_id, notes, badges!inner(name, description, icon)').eq('player_id', playerId),
+  ])
+
+  const withIds = new Set<number>()
+  for (const r of gpRows  ?? []) withIds.add(r.game_id)
+  for (const r of appRows ?? []) withIds.add(r.game_id)
+
+  const calc = (games: typeof allGames): WithWithoutStats | null => {
+    if (!games?.length) return null
+    const mp     = games.length
+    const wins   = games.filter(g => g.result === 'win').length
+    const draws  = games.filter(g => g.result === 'draw').length
+    const losses = games.filter(g => g.result === 'loss').length
+    const gf     = games.reduce((s, g) => s + (g.score_brazuka  ?? 0), 0)
+    const ga     = games.reduce((s, g) => s + (g.score_opponent ?? 0), 0)
+    return { mp, wins, draws, losses, gf, ga,
+      winPct:    Math.round(wins / mp * 100),
+      gfPerGame: +( gf / mp).toFixed(2),
+      gaPerGame: +( ga / mp).toFixed(2),
+    }
+  }
+
+  const withGames    = (allGames ?? []).filter(g => withIds.has(g.id))
+  const withoutGames = withIds.size > 0 ? (allGames ?? []).filter(g => !withIds.has(g.id)) : []
+
+  const badges: PlayerBadge[] = (badgeRows ?? []).map(b => {
+    const badge = b.badges as unknown as { name: string; description: string; icon: string }
+    return { slug: b.badge_slug, name: badge.name, description: badge.description, icon: badge.icon, gameId: b.game_id ?? null, notes: b.notes ?? null }
+  })
+
+  return {
+    withStats:    withIds.size > 0 ? calc(withGames) : null,
+    withoutStats: withIds.size > 0 ? calc(withoutGames) : null,
+    badges,
+  }
+}
+
 export async function getTopOpponents(teamId: number, seasonId?: number) {
   let query = supabase
     .from('games')

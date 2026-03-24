@@ -196,7 +196,7 @@ export default async function Home({
         {players.length > 0 && (
           <section>
             <SectionLabel>Top Players</SectionLabel>
-            <PlayerTable players={playersWithImpact} />
+            <PlayerTable players={playersWithImpact} teamId={teamId} />
           </section>
         )}
 
