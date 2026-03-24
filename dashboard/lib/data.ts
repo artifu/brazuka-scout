@@ -447,6 +447,16 @@ export async function getGoalkeeperStats() {
 
 export type DivisionStanding = {
   team: string; pos: number; mp: number; pts: number; totalTeams: number; seasonName: string
+  w: number; d: number; l: number; gf: number; ga: number; gd: number
+}
+
+export type TeamProjection = {
+  team: string
+  projPosMedian: number   // 50th percentile
+  projPos25:     number   // 25th percentile (better)
+  projPos75:     number   // 75th percentile (worse)
+  probTop3:      number   // 0–100
+  probBottom3:   number   // 0–100
 }
 
 export async function getCurrentSeasonStandings(league = 'brazuka'): Promise<DivisionStanding[]> {
@@ -481,9 +491,13 @@ export async function getCurrentSeasonStandings(league = 'brazuka'): Promise<Div
 
   const totalTeams = Object.keys(t).length
   return Object.entries(t)
-    .map(([team, s]) => ({ team, pts: s.w * 3 + s.d, gd: s.gf - s.ga, mp: s.mp }))
+    .map(([team, s]) => {
+      const pts = s.w * 3 + s.d
+      const gd  = s.gf - s.ga
+      return { team, pts, gd, mp: s.mp, w: s.w, d: s.d, l: s.l, gf: s.gf, ga: s.ga }
+    })
     .sort((a, b) => b.pts - a.pts || b.gd - a.gd)
-    .map((s, i) => ({ team: s.team, pos: i + 1, mp: s.mp, pts: s.pts, totalTeams, seasonName }))
+    .map((s, i) => ({ ...s, pos: i + 1, totalTeams, seasonName }))
 }
 
 export type PlayerBadge = {
@@ -543,6 +557,152 @@ export async function getPlayerProfile(playerId: number, teamId = 1): Promise<Pl
     withoutStats: withIds.size > 0 ? calc(withoutGames) : null,
     badges,
   }
+}
+
+export async function getSeasonProjection(league = 'brazuka'): Promise<TeamProjection[]> {
+  // 1. Find current season
+  const { data: latest } = await supabase
+    .from('division_games')
+    .select('season_name')
+    .eq('league', league)
+    .order('game_date', { ascending: false })
+    .limit(1)
+  if (!latest?.[0]) return []
+  const seasonName = latest[0].season_name
+
+  // 2. Fetch all played games this season (division_games only stores completed results)
+  const { data: games } = await supabase
+    .from('division_games')
+    .select('home_team, away_team, home_score, away_score')
+    .eq('season_name', seasonName)
+    .eq('league', league)
+    .not('home_score', 'is', null)
+    .limit(500)
+  if (!games || games.length === 0) return []
+
+  // 3. Build current standings + track played pairs
+  const t: Record<string, { mp: number; w: number; d: number; l: number; gf: number; ga: number }> = {}
+  const playedPairs: Record<string, number> = {}
+  const pairKey = (a: string, b: string) => (a < b ? `${a}|||${b}` : `${b}|||${a}`)
+  const add = (name: string) => { if (!t[name]) t[name] = { mp: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 } }
+
+  for (const g of games) {
+    add(g.home_team); add(g.away_team)
+    t[g.home_team].mp++; t[g.away_team].mp++
+    t[g.home_team].gf += g.home_score; t[g.home_team].ga += g.away_score
+    t[g.away_team].gf += g.away_score; t[g.away_team].ga += g.home_score
+    if (g.home_score > g.away_score)       { t[g.home_team].w++; t[g.away_team].l++ }
+    else if (g.home_score < g.away_score)  { t[g.home_team].l++; t[g.away_team].w++ }
+    else                                    { t[g.home_team].d++; t[g.away_team].d++ }
+    const pk = pairKey(g.home_team, g.away_team)
+    playedPairs[pk] = (playedPairs[pk] ?? 0) + 1
+  }
+
+  const teams = Object.keys(t)
+  const n = teams.length
+  if (n < 2) return []
+
+  // 4. Detect round-robin format: max times any pair has met = gamesPerMatchup
+  const paircounts = Object.values(playedPairs)
+  const gamesPerMatchup = paircounts.length > 0 ? Math.max(...paircounts) : 1
+
+  // 5. Build remaining fixtures
+  const remaining: { home: string; away: string }[] = []
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const pk = pairKey(teams[i], teams[j])
+      const played = playedPairs[pk] ?? 0
+      const toPlay = Math.max(0, gamesPerMatchup - played)
+      for (let k = 0; k < toPlay; k++) {
+        // Alternate home advantage each repeat
+        if (k % 2 === 0) remaining.push({ home: teams[i], away: teams[j] })
+        else             remaining.push({ home: teams[j], away: teams[i] })
+      }
+    }
+  }
+
+  // 6. Fetch ELO ratings with fuzzy name matching
+  const { data: eloData } = await supabase
+    .from('elo_ratings')
+    .select('team_name, rating')
+    .eq('league', league)
+    .limit(50)
+
+  const eloMap: Record<string, number> = {}
+  for (const row of eloData ?? []) eloMap[row.team_name.toLowerCase()] = row.rating
+
+  const DEFAULT_ELO = 1500
+  const getElo = (team: string): number => {
+    const lower = team.toLowerCase()
+    if (eloMap[lower] != null) return eloMap[lower]
+    // partial match: find elo entry whose name contains or is contained by team
+    for (const [ename, elo] of Object.entries(eloMap)) {
+      if (lower.includes(ename) || ename.includes(lower)) return elo
+    }
+    return DEFAULT_ELO
+  }
+
+  // 7. Monte Carlo – 10 000 simulations
+  const SIMS = 10_000
+  // positionCounts[team][pos] = # of sims where team finished at pos
+  const positionCounts: Record<string, number[]> = {}
+  for (const team of teams) positionCounts[team] = new Array(n + 1).fill(0)
+
+  const baseW: Record<string, number> = {}
+  const basePts: Record<string, number> = {}
+  const baseGd: Record<string, number> = {}
+  for (const team of teams) {
+    baseW[team]   = t[team].w
+    basePts[team] = t[team].w * 3 + t[team].d
+    baseGd[team]  = t[team].gf - t[team].ga
+  }
+
+  for (let sim = 0; sim < SIMS; sim++) {
+    const pts: Record<string, number> = { ...basePts }
+    const gd:  Record<string, number> = { ...baseGd  }
+
+    for (const { home, away } of remaining) {
+      const { win: pWin, draw: pDraw } = predictGame(getElo(home), getElo(away), true)
+      const r = Math.random()
+      if (r < pWin) {
+        pts[home] += 3; gd[home]++; gd[away]--
+      } else if (r < pWin + pDraw) {
+        pts[home]++; pts[away]++
+      } else {
+        pts[away] += 3; gd[away]++; gd[home]--
+      }
+    }
+
+    const ranked = teams.slice().sort((a, b) => pts[b] - pts[a] || gd[b] - gd[a])
+    for (let i = 0; i < ranked.length; i++) positionCounts[ranked[i]][i + 1]++
+  }
+
+  // 8. Aggregate: percentiles + top-3 / bottom-3 probabilities
+  return teams.map(team => {
+    const counts = positionCounts[team]
+    let cumulative = 0
+    let p25 = n, p50 = n, p75 = n
+    let probTop3 = 0, probBottom3 = 0
+
+    for (let pos = 1; pos <= n; pos++) {
+      cumulative += counts[pos]
+      const pct = cumulative / SIMS
+      if (p25 === n && pct >= 0.25) p25 = pos
+      if (p50 === n && pct >= 0.50) p50 = pos
+      if (p75 === n && pct >= 0.75) p75 = pos
+      if (pos <= 3)     probTop3    += counts[pos]
+      if (pos > n - 3)  probBottom3 += counts[pos]
+    }
+
+    return {
+      team,
+      projPosMedian: p50,
+      projPos25:     p25,
+      projPos75:     p75,
+      probTop3:      Math.round(probTop3    / SIMS * 100),
+      probBottom3:   Math.round(probBottom3 / SIMS * 100),
+    }
+  }).sort((a, b) => a.projPosMedian - b.projPosMedian || a.projPos25 - b.projPos25)
 }
 
 export async function getTopOpponents(teamId: number, seasonId?: number) {

@@ -1,8 +1,9 @@
-import { getGames, getTopPlayers, getOverallRecord, getSeasons, getSeasonHistory, getTopOpponents, getEloRankings, getPlayerImpact, getGoalkeeperStats, getUpcomingGames, getUpcomingRecebaGames, getHeadToHead, savePrediction, getCurrentSeasonStandings } from '@/lib/data'
+import { getGames, getTopPlayers, getOverallRecord, getSeasons, getSeasonHistory, getTopOpponents, getEloRankings, getPlayerImpact, getGoalkeeperStats, getUpcomingGames, getUpcomingRecebaGames, getHeadToHead, savePrediction, getCurrentSeasonStandings, getSeasonProjection } from '@/lib/data'
 import PlayerTable from './PlayerTable'
 import GoalkeeperTable from './GoalkeeperTable'
 import SeasonFilter from './SeasonFilter'
 import NextGamePredictor from './NextGamePredictor'
+import CurrentSeasonTable from './CurrentSeasonTable'
 
 export const revalidate = 60
 
@@ -67,20 +68,22 @@ export default async function Home({
   const teamId = team ? parseInt(team) : 1
   const seasonId = season ? parseInt(season) : undefined
 
-  const [games, players, record, seasons, seasonHistory, topOpponents, eloRankings, playerImpact, goalkeepers, upcomingGames, divisionStandings] = await Promise.all([
+  const league = teamId === 2 ? 'receba' : 'brazuka'
+  const [games, players, record, seasons, seasonHistory, topOpponents, eloRankings, playerImpact, goalkeepers, upcomingGames, divisionStandings, seasonProjection] = await Promise.all([
     getGames(seasonId, teamId),
     getTopPlayers(seasonId, teamId),
     getOverallRecord(seasonId, teamId),
     getSeasons(teamId),
     getSeasonHistory(teamId),
     getTopOpponents(teamId, seasonId),
-    getEloRankings(teamId === 2 ? 'receba' : 'brazuka'),
+    getEloRankings(league),
     getPlayerImpact(),
     getGoalkeeperStats(),
     (!seasonId && teamId === 1) ? getUpcomingGames() :
     (!seasonId && teamId === 2) ? getUpcomingRecebaGames() :
     Promise.resolve([] as Awaited<ReturnType<typeof getUpcomingGames>>),
-    (!seasonId) ? getCurrentSeasonStandings(teamId === 2 ? 'receba' : 'brazuka') : Promise.resolve([] as Awaited<ReturnType<typeof getCurrentSeasonStandings>>),
+    (!seasonId) ? getCurrentSeasonStandings(league) : Promise.resolve([] as Awaited<ReturnType<typeof getCurrentSeasonStandings>>),
+    (!seasonId) ? getSeasonProjection(league) : Promise.resolve([] as Awaited<ReturnType<typeof getSeasonProjection>>),
   ])
 
   const gameIdx = gameParam ? Math.max(0, Math.min(parseInt(gameParam), upcomingGames.length - 1)) : 0
@@ -189,6 +192,18 @@ export default async function Home({
               upcomingGames={upcomingGames}
               selectedIdx={gameIdx}
               divisionStandings={divisionStandings}
+            />
+          </section>
+        )}
+
+        {/* Current Season Standings + Projection */}
+        {!seasonId && divisionStandings.length > 0 && (
+          <section>
+            <SectionLabel>Current Season Standings</SectionLabel>
+            <CurrentSeasonTable
+              standings={divisionStandings}
+              projections={seasonProjection}
+              teamId={teamId}
             />
           </section>
         )}
