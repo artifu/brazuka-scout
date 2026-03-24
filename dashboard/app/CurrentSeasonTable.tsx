@@ -22,27 +22,20 @@ function GdCell({ gd }: { gd: number }) {
 
 function ProjCell({ proj, n }: { proj: TeamProjection | undefined; n: number }) {
   if (!proj) return <span className="text-gray-300">—</span>
-  const { projPosMedian: med, projPos25: p25, projPos75: p75, probTop3, probBottom3 } = proj
+  const { projPosMedian: pos } = proj
 
-  const topColor    = probTop3    >= 50 ? 'text-[#009C3B]' : probTop3    >= 20 ? 'text-amber-500' : 'text-gray-400'
-  const bottomColor = probBottom3 >= 50 ? 'text-red-600'   : probBottom3 >= 20 ? 'text-orange-400' : 'text-gray-300'
+  const top3    = pos <= 3
+  const bottom3 = pos > n - 3
+  const colorCls = top3    ? 'bg-[#009C3B]/10 text-[#009C3B] border-[#009C3B]/20'
+                 : bottom3 ? 'bg-red-50 text-red-500 border-red-200'
+                 :           'bg-gray-100 text-gray-500 border-gray-200'
+  const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : null
 
   return (
-    <div className="flex flex-col items-end gap-0.5">
-      <span className="tabular-nums font-black text-sm text-gray-700">
-        {med}
-        <span className="text-gray-300 font-normal text-[10px]">/{n}</span>
-      </span>
-      <span className="text-[9px] text-gray-400 tabular-nums">
-        {p25}–{p75} range
-      </span>
-      {probTop3 >= 5 && (
-        <span className={`text-[9px] font-semibold ${topColor}`}>↑ {probTop3}% top 3</span>
-      )}
-      {probBottom3 >= 5 && (
-        <span className={`text-[9px] font-semibold ${bottomColor}`}>↓ {probBottom3}% btm 3</span>
-      )}
-    </div>
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-bold tabular-nums ${colorCls}`}>
+      {medal && <span className="text-[11px]">{medal}</span>}
+      {pos}<span className="font-normal opacity-50">/{n}</span>
+    </span>
   )
 }
 
@@ -120,10 +113,8 @@ export default function CurrentSeasonTable({
             })}
           </tbody>
         </table>
-        <div className="px-4 py-2.5 bg-gray-50 text-gray-400 text-[10px] border-t border-gray-100 flex flex-wrap gap-x-3">
-          <span>Proj. Finish = median simulated final position.</span>
-          <span>Range = 25th–75th percentile.</span>
-          <span>Top/btm 3 = % of simulations finishing in those positions.</span>
+        <div className="px-4 py-2.5 bg-gray-50 text-gray-400 text-[10px] border-t border-gray-100">
+          Proj. Finish = most likely final position based on 10 000 simulations using ELO win probabilities for remaining fixtures.
         </div>
       </div>
     </div>
