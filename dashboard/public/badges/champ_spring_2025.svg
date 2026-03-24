@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Title 3: Copa América style — tall ornate chalice, deep green -->
+  <circle cx="32" cy="32" r="30" fill="#14532D" stroke="#166534" stroke-width="2.5"/>
+  <!-- Square stepped base -->
+  <rect x="22" y="51" width="20" height="4"  rx="1.5" fill="#FBBF24"/>
+  <rect x="25" y="46" width="14" height="6"  rx="1"   fill="#F59E0B"/>
+  <!-- Thin stem -->
+  <rect x="30" y="38" width="4"  height="9"  fill="#FBBF24"/>
+  <!-- Waist/knop -->
+  <ellipse cx="32" cy="37" rx="6" ry="3" fill="#F59E0B"/>
+  <!-- Tall narrow cup widening to top -->
+  <path d="M23,36 L21,18 Q21,12 32,12 Q43,12 43,18 L41,36 Z" fill="#FBBF24"/>
+  <!-- Decorative rim flare -->
+  <ellipse cx="32" cy="18" rx="12" ry="4" fill="#F59E0B"/>
+  <!-- Inner shadow on cup -->
+  <ellipse cx="32" cy="19" rx="8" ry="3" fill="#FBBF24" opacity="0.5"/>
+  <!-- Small handles (classic ornate) -->
+  <path d="M23,24 Q16,24 16,30 Q16,34 23,34" fill="none" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M41,24 Q48,24 48,30 Q48,34 41,34" fill="none" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+  <!-- Shine -->
+  <line x1="27" y1="16" x2="26" y2="34" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+</svg>

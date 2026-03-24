@@ -332,6 +332,7 @@ export async function getSeasonHistory(teamId: number) {
     supabase
       .from('division_games')
       .select('season_name, home_team, away_team')
+      .eq('league', 'brazuka')
       .limit(5000),
   ])
 
