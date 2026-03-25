@@ -62,7 +62,7 @@ BADGE_DEFS = [
     ("midas_heel",  "Midas Heel",   "Calcanhar de Midas — whenever he uses his heel, the play turns into shit", "midas_heel", "manual"),
     ("levanta",     "Levanta",      "Chora não! Levanta Pai — immortalised by a son on the sidelines",           "levanta",    "manual"),
     ("sbqe",        "SBQE",         "Só Bate Quem Erra",                                                         "sbqe",       "manual"),
-    ("punch_up",    "Punch Up",     "Steamrolled a lower-division team — showed no mercy",                       "punch_up",   "manual"),
+    ("punch_up",    "Punch Up",     "Steamrolled a higher-division team — punched above our weight",              "punch_up",   "manual"),
 ]
 for slug, name, description, icon, auto_rule in BADGE_DEFS:
     sb.table("badges").upsert({
