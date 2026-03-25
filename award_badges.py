@@ -59,6 +59,10 @@ BADGE_DEFS = [
     ("saci",           "Saci",           "Excellence in using both legs — the mischievous ambipedal trickster", "saci",       "manual"),
     ("glass_bones",    "Glass Bones",    "Showing great body resistance to impacts",                          "glass_bones", "manual"),
     ("chapada",        "Chapada",        "Scored a goal directly from a free kick",                           "chapada",     "manual"),
+    ("midas_heel",  "Midas Heel",   "Calcanhar de Midas — whenever he uses his heel, the play turns into shit", "midas_heel", "manual"),
+    ("levanta",     "Levanta",      "Chora não! Levanta Pai — immortalised by a son on the sidelines",           "levanta",    "manual"),
+    ("sbqe",        "SBQE",         "Só Bate Quem Erra",                                                         "sbqe",       "manual"),
+    ("punch_up",    "Punch Up",     "Steamrolled a lower-division team — showed no mercy",                       "punch_up",   "manual"),
 ]
 for slug, name, description, icon, auto_rule in BADGE_DEFS:
     sb.table("badges").upsert({
@@ -138,6 +142,23 @@ MANUAL_AWARDS = [
     # Chapada — free kick goals
     (45, "chapada",     None, None, "Roberto Bandarra — free kick goal"),
     (34, "chapada",     None, None, "Kuster — free kick goal"),
+    # Midas Heel — Luigi's signature heel move that always backfires
+    (35, "midas_heel",  None, None, "Luigi Tedesco — calcanhar de Midas"),
+    # Levanta — Cleiton Moura got nutmegged ('capote') and his son yelled 'levanta, chora nao pai!' from sidelines
+    (51, "levanta", 387, None, "Cleiton Moura — capote 2026-03-24 vs Axolotls, son on sidelines"),
+    # SBQE — Só Bate Quem Erra
+    (34, "sbqe",        None, None, "Kuster — só bate quem erra"),
+    (41, "sbqe",        None, None, "Mazza — só bate quem erra"),
+    (45, "sbqe",        None, None, "Roberto Bandarra — só bate quem erra"),
+    (40, "sbqe",        None, None, "Marcelo D — só bate quem erra"),
+    # Punch Up — 2026-01-27, 6-1 vs Momentum (lower-division, not in regular division table)
+    (31, "punch_up", 8, 1, "Steamrolled Momentum 6-1 — Arthur Mendes"),
+    (34, "punch_up", 8, 1, "Steamrolled Momentum 6-1 — Kuster"),
+    (55, "punch_up", 8, 1, "Steamrolled Momentum 6-1 — Alexis"),
+    (44, "punch_up", 8, 1, "Steamrolled Momentum 6-1 — Lucas Claro"),
+    (57, "punch_up", 8, 1, "Steamrolled Momentum 6-1 — Matheus"),
+    (51, "punch_up", 8, 1, "Steamrolled Momentum 6-1 — Cleiton Moura"),
+    (50, "punch_up", 8, 1, "Steamrolled Momentum 6-1 — Cleiton Castro"),
 ]
 
 # ── Name → player_id alias map for card parsing ───────────────────────────────
