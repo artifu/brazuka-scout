@@ -1,19 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Deep gold background -->
-  <circle cx="32" cy="32" r="30" fill="#B45309"/>
-  <circle cx="32" cy="32" r="30" fill="none" stroke="#78350F" stroke-width="2.5"/>
-  <!-- Leg/shin (upper) -->
-  <rect x="27" y="10" width="10" height="18" rx="5" fill="white"/>
-  <!-- Heel (rounded bulge to the left) -->
-  <ellipse cx="22" cy="31" rx="7" ry="6" fill="white"/>
-  <!-- Foot sole extending right -->
-  <rect x="22" y="29" width="22" height="9" rx="4.5" fill="white"/>
-  <!-- Ball rolling away from heel (to the left) -->
-  <circle cx="12" cy="36" r="5" fill="white" stroke="#78350F" stroke-width="1.5"/>
-  <!-- Ball hexagon seam -->
-  <polygon points="12,31 15,33 15,37 12,39 9,37 9,33" fill="none" stroke="#78350F" stroke-width="1"/>
-  <!-- Gold sparkles = Midas effect (3 stars) -->
-  <path d="M40 12 L41 9 L42 12 L45 12 L43 14 L44 17 L41 15 L38 17 L39 14 L37 12 Z" fill="#FCD34D"/>
-  <circle cx="48" cy="20" r="2" fill="#FCD34D"/>
-  <circle cx="46" cy="28" r="1.5" fill="#FCD34D"/>
+  <!-- Dark background -->
+  <circle cx="32" cy="32" r="30" fill="#1C1917"/>
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#292524" stroke-width="2.5"/>
+  <!-- Lower leg / ankle (skin tone) coming from top-right -->
+  <rect x="34" y="8" width="12" height="22" rx="6" fill="#FDDCAA"/>
+  <!-- Top of foot arching forward to the left -->
+  <path d="M34 28 Q33 36 26 37 L14 37 Q10 37 10 34 Q10 31 14 31 L26 31 Q32 30 34 28 Z" fill="#FDDCAA"/>
+  <!-- Sole -->
+  <rect x="10" y="34" width="26" height="6" rx="3" fill="#D4A96A"/>
+  <!-- GOLDEN HEEL — prominent, glowing -->
+  <ellipse cx="41" cy="34" rx="9" ry="11" fill="#F59E0B"/>
+  <ellipse cx="41" cy="34" rx="9" ry="11" fill="none" stroke="#B45309" stroke-width="1.5"/>
+  <!-- Highlight on heel (sheen) -->
+  <ellipse cx="38" cy="29" rx="3.5" ry="2.5" fill="#FEF9C3" opacity="0.7"/>
+  <!-- Sparkle stars around heel (Midas touch) -->
+  <path d="M54 12 L55 9 L56 12 L59 12 L57 14 L58 17 L55 15 L52 17 L53 14 L51 12 Z" fill="#FCD34D"/>
+  <circle cx="52" cy="22" r="2" fill="#FCD34D"/>
+  <circle cx="57" cy="28" r="1.5" fill="#FCD34D"/>
+  <circle cx="50" cy="30" r="1" fill="#FEF3C7"/>
 </svg>
