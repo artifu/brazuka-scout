@@ -3,31 +3,36 @@
   <circle cx="32" cy="32" r="30" fill="#0F172A"/>
   <circle cx="32" cy="32" r="30" fill="none" stroke="#1E3A5F" stroke-width="2.5"/>
 
-  <!-- Foot X-ray — top-down view, toes pointing right -->
+  <!-- Foot X-ray — top-down, toes pointing right -->
   <!-- Heel / tarsal block -->
-  <ellipse cx="14" cy="32" rx="8" ry="10" fill="#BFDBFE"/>
+  <ellipse cx="13" cy="32" rx="8" ry="11" fill="#BFDBFE"/>
 
-  <!-- Metatarsals — 5 long bones fanning out to toes -->
-  <!-- Bottom metatarsal (pinky side) -->
-  <rect x="18" y="42" width="22" height="4" rx="2" fill="#BFDBFE" transform="rotate(-8 18 44)"/>
-  <!-- 2nd metatarsal -->
-  <rect x="18" y="36" width="24" height="4" rx="2" fill="#BFDBFE" transform="rotate(-3 18 38)"/>
-  <!-- Middle metatarsal -->
-  <rect x="18" y="30" width="25" height="4" rx="2" fill="#BFDBFE"/>
-  <!-- 4th metatarsal -->
-  <rect x="18" y="24" width="24" height="4" rx="2" fill="#BFDBFE" transform="rotate(3 18 26)"/>
-  <!-- Big toe metatarsal -->
-  <rect x="18" y="18" width="22" height="5" rx="2.5" fill="#BFDBFE" transform="rotate(8 18 20)"/>
+  <!-- 5 metatarsals fanning out -->
+  <rect x="17" y="42" width="21" height="3.5" rx="1.5" fill="#BFDBFE" transform="rotate(-9 17 44)"/>
+  <rect x="17" y="36" width="23" height="3.5" rx="1.5" fill="#BFDBFE" transform="rotate(-4 17 38)"/>
+  <rect x="17" y="30" width="24" height="3.5" rx="1.5" fill="#BFDBFE"/>
+  <rect x="17" y="24" width="23" height="3.5" rx="1.5" fill="#BFDBFE" transform="rotate(4 17 26)"/>
+  <!-- Big toe metatarsal (wider) -->
+  <rect x="17" y="17" width="21" height="5" rx="2" fill="#BFDBFE" transform="rotate(9 17 19)"/>
 
-  <!-- Toe tips (phalanges) — small rounded ends -->
-  <ellipse cx="44" cy="47" rx="3" ry="2" fill="#BFDBFE"/>
-  <ellipse cx="45" cy="40" rx="3" ry="2" fill="#BFDBFE"/>
-  <ellipse cx="46" cy="33" rx="3.5" ry="2" fill="#BFDBFE"/>
-  <ellipse cx="45" cy="26" rx="3" ry="2" fill="#BFDBFE"/>
-  <ellipse cx="43" cy="19" rx="4" ry="2.5" fill="#BFDBFE"/>
+  <!-- Toe phalanges (connected) — pinky to 2nd toe -->
+  <ellipse cx="42" cy="47" rx="2.5" ry="1.8" fill="#BFDBFE"/>
+  <ellipse cx="43" cy="40" rx="2.5" ry="1.8" fill="#BFDBFE"/>
+  <ellipse cx="44" cy="33" rx="3" ry="1.8" fill="#BFDBFE"/>
+  <ellipse cx="43" cy="26" rx="2.5" ry="1.8" fill="#BFDBFE"/>
 
-  <!-- CRACK on middle metatarsal — jagged red fracture -->
-  <polyline points="28,28 31,32 27,36" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Big toe proximal phalange (still attached, cracked end) -->
+  <ellipse cx="41" cy="19" rx="3.5" ry="2.2" fill="#BFDBFE"/>
+
+  <!-- BIG TOE TIP — completely snapped off, floating away -->
+  <ellipse cx="52" cy="15" rx="3" ry="2" fill="#BFDBFE"/>
+
+  <!-- Crack / gap between big toe tip and base -->
+  <line x1="45" y1="18" x2="49" y2="16" stroke="#EF4444" stroke-width="1.5" stroke-linecap="round"/>
   <!-- Crack glow -->
-  <polyline points="28,28 31,32 27,36" fill="none" stroke="#FCA5A5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.25"/>
+  <line x1="45" y1="18" x2="49" y2="16" stroke="#FCA5A5" stroke-width="4" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Small red impact dots around the break -->
+  <circle cx="47" cy="14" r="1" fill="#FCA5A5"/>
+  <circle cx="50" cy="19" r="1" fill="#FCA5A5"/>
 </svg>
