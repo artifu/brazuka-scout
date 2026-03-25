@@ -1,22 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- X-ray dark blue background -->
+  <!-- X-ray dark background -->
   <circle cx="32" cy="32" r="30" fill="#0F172A"/>
   <circle cx="32" cy="32" r="30" fill="none" stroke="#1E3A5F" stroke-width="2.5"/>
-  <!-- Bone (tibia/femur style) — X-ray white-blue -->
-  <!-- Top knob -->
-  <ellipse cx="32" cy="12" rx="9" ry="6" fill="#BFDBFE"/>
-  <!-- Shaft -->
-  <rect x="28" y="16" width="8" height="30" rx="4" fill="#BFDBFE"/>
-  <!-- Bottom knob -->
-  <ellipse cx="32" cy="52" rx="9" ry="6" fill="#BFDBFE"/>
-  <!-- Inner bone cavity (darker centre — realistic) -->
-  <rect x="30" y="20" width="4" height="22" rx="2" fill="#1E40AF" opacity="0.4"/>
-  <!-- CRACK — jagged fracture through the shaft -->
-  <polyline points="25,28 30,32 26,36 31,40 28,44" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Foot X-ray — top-down view, toes pointing right -->
+  <!-- Heel / tarsal block -->
+  <ellipse cx="14" cy="32" rx="8" ry="10" fill="#BFDBFE"/>
+
+  <!-- Metatarsals — 5 long bones fanning out to toes -->
+  <!-- Bottom metatarsal (pinky side) -->
+  <rect x="18" y="42" width="22" height="4" rx="2" fill="#BFDBFE" transform="rotate(-8 18 44)"/>
+  <!-- 2nd metatarsal -->
+  <rect x="18" y="36" width="24" height="4" rx="2" fill="#BFDBFE" transform="rotate(-3 18 38)"/>
+  <!-- Middle metatarsal -->
+  <rect x="18" y="30" width="25" height="4" rx="2" fill="#BFDBFE"/>
+  <!-- 4th metatarsal -->
+  <rect x="18" y="24" width="24" height="4" rx="2" fill="#BFDBFE" transform="rotate(3 18 26)"/>
+  <!-- Big toe metatarsal -->
+  <rect x="18" y="18" width="22" height="5" rx="2.5" fill="#BFDBFE" transform="rotate(8 18 20)"/>
+
+  <!-- Toe tips (phalanges) — small rounded ends -->
+  <ellipse cx="44" cy="47" rx="3" ry="2" fill="#BFDBFE"/>
+  <ellipse cx="45" cy="40" rx="3" ry="2" fill="#BFDBFE"/>
+  <ellipse cx="46" cy="33" rx="3.5" ry="2" fill="#BFDBFE"/>
+  <ellipse cx="45" cy="26" rx="3" ry="2" fill="#BFDBFE"/>
+  <ellipse cx="43" cy="19" rx="4" ry="2.5" fill="#BFDBFE"/>
+
+  <!-- CRACK on middle metatarsal — jagged red fracture -->
+  <polyline points="28,28 31,32 27,36" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   <!-- Crack glow -->
-  <polyline points="25,28 30,32 26,36 31,40 28,44" fill="none" stroke="#FCA5A5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.25"/>
-  <!-- Impact stars -->
-  <circle cx="20" cy="30" r="1.5" fill="#FCA5A5"/>
-  <circle cx="17" cy="36" r="1" fill="#FCA5A5"/>
-  <circle cx="21" cy="40" r="1" fill="#FCA5A5"/>
+  <polyline points="28,28 31,32 27,36" fill="none" stroke="#FCA5A5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.25"/>
 </svg>
