@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Deep gold background -->
+  <circle cx="32" cy="32" r="30" fill="#B45309"/>
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#78350F" stroke-width="2.5"/>
+  <!-- Leg/shin (upper) -->
+  <rect x="27" y="10" width="10" height="18" rx="5" fill="white"/>
+  <!-- Heel (rounded bulge to the left) -->
+  <ellipse cx="22" cy="31" rx="7" ry="6" fill="white"/>
+  <!-- Foot sole extending right -->
+  <rect x="22" y="29" width="22" height="9" rx="4.5" fill="white"/>
+  <!-- Ball rolling away from heel (to the left) -->
+  <circle cx="12" cy="36" r="5" fill="white" stroke="#78350F" stroke-width="1.5"/>
+  <!-- Ball hexagon seam -->
+  <polygon points="12,31 15,33 15,37 12,39 9,37 9,33" fill="none" stroke="#78350F" stroke-width="1"/>
+  <!-- Gold sparkles = Midas effect (3 stars) -->
+  <path d="M40 12 L41 9 L42 12 L45 12 L43 14 L44 17 L41 15 L38 17 L39 14 L37 12 Z" fill="#FCD34D"/>
+  <circle cx="48" cy="20" r="2" fill="#FCD34D"/>
+  <circle cx="46" cy="28" r="1.5" fill="#FCD34D"/>
+</svg>

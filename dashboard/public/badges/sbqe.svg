@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Dark crimson background -->
+  <circle cx="32" cy="32" r="30" fill="#991B1B"/>
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#7F1D1D" stroke-width="2.5"/>
+  <!-- Fist (clenched, from the right, pointing left — the punch) -->
+  <!-- Palm/back of hand -->
+  <rect x="18" y="26" width="22" height="18" rx="4" fill="white"/>
+  <!-- Four finger knuckle bumps across top -->
+  <ellipse cx="22" cy="26" rx="4" ry="3.5" fill="white"/>
+  <ellipse cx="28" cy="24" rx="4" ry="3.5" fill="white"/>
+  <ellipse cx="34" cy="24" rx="4" ry="3.5" fill="white"/>
+  <ellipse cx="40" cy="26" rx="4" ry="3.5" fill="white"/>
+  <!-- Thumb (on the right side, folded) -->
+  <ellipse cx="41" cy="32" rx="3.5" ry="5" fill="white"/>
+  <!-- Impact lines radiating from left (direction of punch) -->
+  <line x1="16" y1="30" x2="8"  y2="26" stroke="#FCA5A5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="16" y1="35" x2="7"  y2="35" stroke="#FCA5A5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="16" y1="40" x2="8"  y2="44" stroke="#FCA5A5" stroke-width="2" stroke-linecap="round"/>
+  <!-- SBQE text at bottom -->
+  <text x="32" y="57" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="8" font-weight="900" fill="white" letter-spacing="1">SBQE</text>
+</svg>

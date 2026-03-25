@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Warm green pitch background -->
+  <circle cx="32" cy="32" r="30" fill="#15803D"/>
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#14532D" stroke-width="2.5"/>
+  <!-- Head (skin tone) -->
+  <circle cx="32" cy="30" r="16" fill="#FBBF24"/>
+  <!-- Curly hair - dark brown, represented by overlapping bumps across top -->
+  <path d="M17 28 Q17 14 24 13 Q27 9 32 9 Q37 9 40 13 Q47 14 47 28" fill="#78350F" stroke="none"/>
+  <!-- Individual curly bumps on hair -->
+  <circle cx="21" cy="18" r="4" fill="#78350F"/>
+  <circle cx="26" cy="14" r="4" fill="#78350F"/>
+  <circle cx="32" cy="12" r="4" fill="#78350F"/>
+  <circle cx="38" cy="14" r="4" fill="#78350F"/>
+  <circle cx="43" cy="18" r="4" fill="#78350F"/>
+  <!-- Eyes (wide open, alarmed) -->
+  <circle cx="25" cy="28" r="3" fill="white"/>
+  <circle cx="39" cy="28" r="3" fill="white"/>
+  <circle cx="25" cy="29" r="1.5" fill="#1E293B"/>
+  <circle cx="39" cy="29" r="1.5" fill="#1E293B"/>
+  <!-- Screaming mouth (wide open oval) -->
+  <ellipse cx="32" cy="40" rx="7" ry="5" fill="#1E293B"/>
+  <ellipse cx="32" cy="38" rx="5" ry="2" fill="#F87171"/>
+  <!-- Exclamation marks on sides (emphasis) -->
+  <text x="8" y="36" font-family="Arial Black, sans-serif" font-size="12" font-weight="900" fill="white">!</text>
+  <text x="52" y="36" font-family="Arial Black, sans-serif" font-size="12" font-weight="900" fill="white">!</text>
+</svg>
