@@ -1,2 +1,6 @@
 anthropic>=0.40.0
 supabase>=2.0.0
+
+# RAG pipeline
+voyageai>=0.3.0       # embeddings (voyage-3-lite, 512-dim) — free tier at voyageai.com
+python-dotenv>=1.0.0  # load .env automatically

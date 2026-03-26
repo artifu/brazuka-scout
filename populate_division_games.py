@@ -20,6 +20,7 @@ BASE = "https://apps.daysmartrecreation.com/dash/jsonapi/api/v1"
 HEADERS = {"Accept": "application/vnd.api+json", "User-Agent": "Mozilla/5.0"}
 
 BRAZUKA_SEASONS = [
+    ("219258", "Winter 2025-26"),
     ("215810", "Winter I 2025"),
     ("214012", "Fall 2025"),
     ("213250", "Summer 2025"),
@@ -37,6 +38,7 @@ BRAZUKA_SEASONS = [
     ("184892", "Winter II 2023"),
     ("181899", "Winter I 2022"),
     ("181297", "Fall 2022"),
+    ("179515", "Summer 2022"),
     ("177686", "Spring 2022"),
     ("174858", "Winter II 2022"),
     ("172413", "Winter I 2021"),

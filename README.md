@@ -55,10 +55,24 @@ Before every game, the dashboard shows a Kalshi-style probability card:
 | ⚡ Chapada | Screamer free kick |
 | ...and many more | |
 
-### 🤖 AI Data Pipeline
-- Parsed **5 years of WhatsApp group chat** (194k+ lines) using Claude AI
-- Extracted match results, goal scorers, assists, cards, and player availability from freeform Portuguese messages
-- Backfilled all seasons (2021–2025) including data not available in Arena Sports
+### 🤖 AI Data Pipeline + RAG
+The entire data layer is AI-powered:
+
+**Extraction pipeline:**
+- Parsed **5 years of WhatsApp group chat** (194k+ lines, bilingual PT/EN) using Claude AI
+- Custom `game_detector.py` clusters messages into game windows using temporal proximity and keyword signals
+- Claude extracts structured JSON (scorers, result, cards, funny moments) from freeform chat
+
+**RAG pipeline (Retrieval-Augmented Generation):**
+- Indexes all game windows as vector-embedded chunks in **Supabase pgvector**
+- 3-stage pipeline: chunking → classification (Claude Haiku) → embedding (Voyage AI `voyage-3-lite`)
+- Claude Haiku classifies each chunk (`result / signup / injury / banter / logistics / off_topic`) before embedding — filters ~70% of noise before it hits the vector store
+- Semantic search over 5 years of match history: *"quando foi a última vez que ganhamos da Newbeebee?"*
+
+**Player audit system:**
+- `audit_player.py` — scans all 452 game windows to recover missing appearances
+- Smart "last signup list" algorithm: takes the final version of each game's forwarded signup chain, extracts the confirmed player list, and cross-references with the DB
+- Recovered **50+ missing appearances** across Mazza, Igor, Chico and others — correcting 4 years of incomplete tracking
 
 ---
 
@@ -97,7 +111,9 @@ For each remaining fixture in the current season, samples win/draw/loss outcomes
 | Dashboard | Next.js (App Router) + TypeScript + Tailwind CSS |
 | Database | Supabase (PostgreSQL) |
 | Hosting | Vercel (auto-deploy on push to `main`) |
-| AI Extraction | Claude (Anthropic) |
+| AI Extraction | Claude (Anthropic) — structured JSON from freeform chat |
+| RAG / Embeddings | Voyage AI (`voyage-3-lite`) + Supabase pgvector |
+| RAG Classifier | Claude Haiku — chunk labeling before embedding |
 | Data sources | WhatsApp exports + Arena Sports API |
 | Analytics | Python (statsmodels, pandas) |
 
@@ -123,6 +139,17 @@ brazuka-scout/
 ├── parser.py                         # WhatsApp .txt → Message objects
 ├── game_detector.py                  # Identify game windows in chat history
 ├── extractor.py                      # Claude API → structured match JSON
+├── audit_player.py                   # Recover missing appearances via signup-list analysis
+│
+├── rag/                              # RAG pipeline
+│   ├── chunker.py                    # Split chat into game/general chunks
+│   ├── classifier.py                 # Claude Haiku chunk labeling
+│   ├── embedder.py                   # Voyage AI embeddings
+│   ├── indexer.py                    # Supabase pgvector upsert
+│   └── query.py                      # Semantic search + Claude answer generation
+├── rag_cli.py                        # CLI: index / query / stats
+├── migrations/create_rag_chunks.sql  # pgvector table + HNSW index
+│
 ├── award_badges.py                   # Badge award logic (idempotent)
 ├── compute_player_impact.py          # Win Lift OLS regression
 ├── populate_division_games.py        # Backfill all division results
@@ -148,14 +175,31 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 
 **Python scripts** (data pipeline):
 ```bash
-pip install anthropic supabase pandas statsmodels
+pip install anthropic supabase pandas statsmodels voyageai python-dotenv
 export ANTHROPIC_API_KEY=...
+export VOYAGE_API_KEY=...
 export SUPABASE_URL=...
 export SUPABASE_KEY=...
 
-python main.py import _chat.txt   # parse + extract + save
-python compute_player_impact.py   # recalculate win lift model
-python award_badges.py            # sync badges to Supabase
+python main.py import _chat.txt        # parse + extract + save
+python compute_player_impact.py        # recalculate win lift model
+python award_badges.py                 # sync badges to Supabase
+```
+
+**RAG pipeline:**
+```bash
+python rag_cli.py index                # chunk → classify → embed → store (full pipeline)
+python rag_cli.py index --game-only    # only index game chunks (faster)
+python rag_cli.py stats                # show index stats
+
+python rag_cli.py query "quem é nosso artilheiro histórico?"
+python rag_cli.py query "quando ganhamos da Newbeebee?" --verbose
+```
+
+**Player audit:**
+```bash
+python audit_player.py "Mazza"         # find missing appearances
+python audit_player.py "Igor" --add    # add confirmed appearances to DB
 ```
 
 ---
@@ -164,6 +208,7 @@ python award_badges.py            # sync badges to Supabase
 
 - [x] Phase 1 — WhatsApp parser + Claude AI extractor + SQLite CLI
 - [x] Phase 2 — Live web dashboard (Supabase + Next.js + Vercel)
+- [x] Phase 2.5 — RAG pipeline (pgvector + Voyage AI + Claude) + player audit system
 - [ ] Phase 3 — WhatsApp bot (auto-ingest results + answer stat queries in the group chat)
 
 ---
