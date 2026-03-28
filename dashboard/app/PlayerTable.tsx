@@ -220,7 +220,7 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
   function Th({ label, k, title, className }: { label: string; k: SortKey; title?: string; className?: string }) {
     const active = sortKey === k
     return (
-      <th className={`px-3 py-3 text-center cursor-pointer select-none transition-colors ${active ? 'text-[#009C3B]' : 'text-gray-400 hover:text-gray-600'} ${className ?? ''}`}
+      <th className={`px-1.5 sm:px-3 py-3 text-center cursor-pointer select-none transition-colors ${active ? 'text-[#009C3B]' : 'text-gray-400 hover:text-gray-600'} ${className ?? ''}`}
         onClick={() => handleSort(k)} title={title}>
         {label}
         <span className="ml-0.5 text-[10px]">{active ? (sortDesc ? '▼' : '▲') : ''}</span>
@@ -232,14 +232,14 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm" style={{ overflow: 'visible' }}>
-      <table className="w-full text-sm">
+      <table className="w-full text-xs sm:text-sm">
         <thead>
-          <tr className="border-b border-gray-100 text-xs uppercase tracking-wider">
-            <th className="px-5 py-3 text-left w-8 text-gray-400">#</th>
-            <th className="px-3 py-3 text-left text-gray-400">Player</th>
+          <tr className="border-b border-gray-100 text-[10px] sm:text-xs uppercase tracking-wider">
+            <th className="px-2 sm:px-5 py-3 text-left w-6 sm:w-8 text-gray-400">#</th>
+            <th className="px-2 sm:px-3 py-3 text-left text-gray-400">Player</th>
             <Th label="G"       k="goals"            title="Goals" />
             <Th label="A"       k="assists"          title="Assists" />
-            <th className="hidden sm:table-cell px-3 py-3 text-center text-gray-400 cursor-pointer select-none"
+            <th className="hidden sm:table-cell px-1.5 sm:px-3 py-3 text-center text-gray-400 cursor-pointer select-none"
               onClick={() => handleSort('contributions')} title="Goals + Assists">
               G+A<span className="ml-0.5 text-[10px]">{sortKey === 'contributions' ? (sortDesc ? '▼' : '▲') : ''}</span>
             </th>
@@ -259,14 +259,14 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
                   onClick={() => toggleExpand(p.playerId)}
                   className={`${!isExpanded && !isLast ? 'border-b border-gray-100' : ''} ${p.playerId !== null ? 'cursor-pointer hover:bg-gray-50 group' : ''} ${isExpanded ? 'bg-gray-50' : ''} transition-colors`}
                 >
-                  <td className="px-5 py-3 text-gray-400 text-xs tabular-nums text-right">{medal(i) ?? i + 1}</td>
-                  <td className={`py-3 font-medium transition-all ${isExpanded ? 'pl-[10px] pr-3 border-l-2 border-[#009C3B]' : 'px-3 border-l-2 border-transparent'}`}>
-                    <span className={`${isExpanded ? 'text-[#009C3B]' : 'text-gray-800'} ${p.playerId !== null ? 'group-hover:underline underline-offset-2 decoration-dotted decoration-gray-400' : ''}`}>
+                  <td className="px-2 sm:px-5 py-3 text-gray-400 text-[10px] sm:text-xs tabular-nums text-right">{medal(i) ?? i + 1}</td>
+                  <td className={`py-3 font-medium transition-all ${isExpanded ? 'pl-[8px] sm:pl-[10px] pr-2 sm:pr-3 border-l-2 border-[#009C3B]' : 'px-2 sm:px-3 border-l-2 border-transparent'}`}>
+                    <span className={`whitespace-nowrap ${isExpanded ? 'text-[#009C3B]' : 'text-gray-800'} ${p.playerId !== null ? 'group-hover:underline underline-offset-2 decoration-dotted decoration-gray-400' : ''}`}>
                       {p.player}
                     </span>
                   </td>
-                  <td className={`px-3 py-3 text-center tabular-nums font-bold ${sortKey === 'goals' ? 'text-[#009C3B]' : 'text-gray-600'}`}>{p.goals}</td>
-                  <td className={`px-3 py-3 text-center tabular-nums ${sortKey === 'assists' ? 'text-[#002776] font-bold' : 'text-gray-500'}`}>
+                  <td className={`px-1.5 sm:px-3 py-3 text-center tabular-nums font-bold ${sortKey === 'goals' ? 'text-[#009C3B]' : 'text-gray-600'}`}>{p.goals}</td>
+                  <td className={`px-1.5 sm:px-3 py-3 text-center tabular-nums ${sortKey === 'assists' ? 'text-[#002776] font-bold' : 'text-gray-500'}`}>
                     {p.assists > 0 ? p.assists : <span className="text-gray-300">—</span>}
                   </td>
                   <td className={`hidden sm:table-cell px-3 py-3 text-center tabular-nums font-bold ${sortKey === 'contributions' ? 'text-[#009C3B]' : 'text-gray-600'}`}>{p.contributions}</td>
@@ -275,12 +275,12 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
                       ? <>{p.gpInferred && <span className="text-gray-300 text-[10px] mr-0.5">≥</span>}{p.gamesPlayed}</>
                       : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-3 py-3 text-right tabular-nums">
+                  <td className="px-1.5 sm:px-3 py-3 text-right tabular-nums">
                     {p.participationRate != null
                       ? <span className={`font-semibold ${sortKey === 'participationRate' ? 'text-[#009C3B]' : 'text-gray-700'}`}>{p.participationRate.toFixed(2)}</span>
                       : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-5 py-3 text-right">
+                  <td className="px-2 sm:px-5 py-3 text-right">
                     <WinLiftCell winLift={p.winLift} pValue={p.winLiftPValue} confidence={p.winLiftConfidence} />
                   </td>
                 </tr>
