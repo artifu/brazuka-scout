@@ -79,6 +79,7 @@ export default function CurrentSeasonTable({
               <th className="px-2 py-3 text-center hidden sm:table-cell">GA</th>
               <th className="px-2 py-3 text-center">GD</th>
               <th className="px-2 py-3 text-center font-black text-[#002776]">Pts</th>
+              <th className="px-2 py-3 text-center hidden sm:table-cell">PCT</th>
               <th className="px-3 py-3 text-right">Proj. Finish</th>
             </tr>
           </thead>
@@ -111,6 +112,9 @@ export default function CurrentSeasonTable({
                   <td className="px-2 py-3 text-center text-gray-500 tabular-nums hidden sm:table-cell">{s.ga}</td>
                   <td className="px-2 py-3 text-center"><GdCell gd={s.gd} /></td>
                   <td className="px-2 py-3 text-center font-black text-[#002776] tabular-nums">{s.pts}</td>
+                  <td className="px-2 py-3 text-center text-gray-500 tabular-nums hidden sm:table-cell">
+                    {s.mp > 0 ? `${((s.w + s.d / 2) / s.mp * 100).toFixed(2)}%` : '—'}
+                  </td>
                   <td className="px-3 py-3 text-right">
                     {proj && projRank.has(s.team)
                       ? <ProjCell rank={projRank.get(s.team)!} proj={proj} n={n} />
