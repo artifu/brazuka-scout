@@ -217,10 +217,10 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
     return sortDesc ? (bv as number) - (av as number) : (av as number) - (bv as number)
   })
 
-  function Th({ label, k, title }: { label: string; k: SortKey; title?: string }) {
+  function Th({ label, k, title, className }: { label: string; k: SortKey; title?: string; className?: string }) {
     const active = sortKey === k
     return (
-      <th className={`px-3 py-3 text-center cursor-pointer select-none transition-colors ${active ? 'text-[#009C3B]' : 'text-gray-400 hover:text-gray-600'}`}
+      <th className={`px-3 py-3 text-center cursor-pointer select-none transition-colors ${active ? 'text-[#009C3B]' : 'text-gray-400 hover:text-gray-600'} ${className ?? ''}`}
         onClick={() => handleSort(k)} title={title}>
         {label}
         <span className="ml-0.5 text-[10px]">{active ? (sortDesc ? '▼' : '▲') : ''}</span>
@@ -243,7 +243,7 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
               onClick={() => handleSort('contributions')} title="Goals + Assists">
               G+A<span className="ml-0.5 text-[10px]">{sortKey === 'contributions' ? (sortDesc ? '▼' : '▲') : ''}</span>
             </th>
-            <Th label="MP"      k="gamesPlayed"      title="Matches Played" />
+            <Th label="MP"      k="gamesPlayed"      title="Matches Played"             className="hidden sm:table-cell" />
             <Th label="G+A/MP"  k="participationRate" title="Goal contributions per match" />
             <Th label="Win Lift" k="winLift"          title="Win probability increase when player is present" />
           </tr>
@@ -270,7 +270,7 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
                     {p.assists > 0 ? p.assists : <span className="text-gray-300">—</span>}
                   </td>
                   <td className={`hidden sm:table-cell px-3 py-3 text-center tabular-nums font-bold ${sortKey === 'contributions' ? 'text-[#009C3B]' : 'text-gray-600'}`}>{p.contributions}</td>
-                  <td className="px-3 py-3 text-center text-gray-400 tabular-nums">
+                  <td className="hidden sm:table-cell px-3 py-3 text-center text-gray-400 tabular-nums">
                     {p.gamesPlayed != null
                       ? <>{p.gpInferred && <span className="text-gray-300 text-[10px] mr-0.5">≥</span>}{p.gamesPlayed}</>
                       : <span className="text-gray-300">—</span>}

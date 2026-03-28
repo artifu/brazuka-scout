@@ -20,10 +20,12 @@ import os, re, time, subprocess, sys
 from pathlib import Path
 from collections import defaultdict
 
-for line in (Path(__file__).parent / ".env").read_text().splitlines():
-    line = line.strip()
-    if line and not line.startswith("#") and "=" in line:
-        k, v = line.split("=", 1); os.environ.setdefault(k.strip(), v.strip())
+_env = Path(__file__).parent / ".env"
+if _env.exists():
+    for line in _env.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1); os.environ.setdefault(k.strip(), v.strip())
 
 import requests
 from supabase import create_client

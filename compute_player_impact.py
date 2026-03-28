@@ -21,10 +21,12 @@ import statsmodels.api as sm
 from pathlib import Path
 
 # ── Load env ──────────────────────────────────────────────────────────────────
-for line in (Path(__file__).parent / ".env").read_text().splitlines():
-    line = line.strip()
-    if line and not line.startswith("#") and "=" in line:
-        k, v = line.split("=", 1); os.environ.setdefault(k.strip(), v.strip())
+_env = Path(__file__).parent / ".env"
+if _env.exists():
+    for line in _env.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1); os.environ.setdefault(k.strip(), v.strip())
 
 from supabase import create_client
 sb = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"])
