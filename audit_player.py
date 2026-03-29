@@ -133,7 +133,8 @@ def alias_in_names(aliases: list[str], names: list[str]) -> bool:
             if name.startswith(alias) and (len(name) == len(alias) or name[len(alias)] in ' +-✅'):
                 return True
             # alias starts with name as a whole word: "joao b" in list matches alias "joao barros"
-            if alias.startswith(name) and (len(alias) == len(name) or alias[len(name)] in ' +-'):
+            # Require name to contain a space — prevents bare "marcelo" from matching alias "marcelo mazza"
+            if ' ' in name and alias.startswith(name) and (len(alias) == len(name) or alias[len(name)] in ' +-'):
                 return True
     return False
 

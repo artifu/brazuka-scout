@@ -66,21 +66,21 @@ export default function CurrentSeasonTable({
         {seasonName} · {n} teams · Projection based on 10 000 simulations using ELO ratings for remaining fixtures.
       </p>
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs sm:text-sm">
           <thead>
             <tr className="border-b border-gray-100 text-[10px] text-gray-400 uppercase tracking-wider">
-              <th className="px-3 py-3 text-center w-8">#</th>
-              <th className="px-3 py-3 text-left">Team</th>
-              <th className="px-2 py-3 text-center">MP</th>
-              <th className="px-2 py-3 text-center">W</th>
-              <th className="px-2 py-3 text-center">D</th>
-              <th className="px-2 py-3 text-center">L</th>
-              <th className="px-2 py-3 text-center hidden sm:table-cell">GF</th>
-              <th className="px-2 py-3 text-center hidden sm:table-cell">GA</th>
-              <th className="px-2 py-3 text-center">GD</th>
-              <th className="px-2 py-3 text-center font-black text-[#002776]">Pts</th>
-              <th className="px-2 py-3 text-center hidden sm:table-cell">PCT</th>
-              <th className="px-3 py-3 text-right">Proj. Finish</th>
+              <th className="px-1.5 sm:px-3 py-3 text-center w-6 sm:w-8">#</th>
+              <th className="px-2 sm:px-3 py-3 text-left">Team</th>
+              <th className="px-1 sm:px-2 py-3 text-center">MP</th>
+              <th className="px-1 sm:px-2 py-3 text-center">W</th>
+              <th className="px-1 sm:px-2 py-3 text-center">D</th>
+              <th className="px-1 sm:px-2 py-3 text-center">L</th>
+              <th className="px-1 sm:px-2 py-3 text-center hidden sm:table-cell">GF</th>
+              <th className="px-1 sm:px-2 py-3 text-center hidden sm:table-cell">GA</th>
+              <th className="px-1 sm:px-2 py-3 text-center hidden sm:table-cell">GD</th>
+              <th className="px-1 sm:px-2 py-3 text-center font-black text-[#002776]">Pts</th>
+              <th className="px-1 sm:px-2 py-3 text-center">PCT</th>
+              <th className="px-1.5 sm:px-3 py-3 text-right">Proj.</th>
             </tr>
           </thead>
           <tbody>
@@ -93,29 +93,29 @@ export default function CurrentSeasonTable({
                   key={s.team}
                   className={`${!isLast ? 'border-b border-gray-100' : ''} ${mine ? 'bg-[#009C3B]/5' : 'hover:bg-gray-50'} transition-colors`}
                 >
-                  <td className="px-3 py-3 text-center text-gray-400 text-xs tabular-nums">
+                  <td className="px-1.5 sm:px-3 py-3 text-center text-gray-400 text-[10px] sm:text-xs tabular-nums">
                     {s.pos === 1 ? '🥇' : s.pos === 2 ? '🥈' : s.pos === 3 ? '🥉' : s.pos}
                   </td>
-                  <td className="px-3 py-3">
-                    <span className={`font-medium ${mine ? 'text-[#009C3B]' : 'text-gray-800'}`}>
+                  <td className="px-2 sm:px-3 py-3">
+                    <span className={`font-medium whitespace-nowrap ${mine ? 'text-[#009C3B]' : 'text-gray-800'}`}>
                       {s.team}
                     </span>
                     {mine && (
-                      <span className="ml-2 text-[9px] font-bold text-[#009C3B] bg-[#009C3B]/10 px-1.5 py-0.5 rounded-full">US</span>
+                      <span className="ml-1.5 text-[9px] font-bold text-[#009C3B] bg-[#009C3B]/10 px-1.5 py-0.5 rounded-full">US</span>
                     )}
                   </td>
-                  <td className="px-2 py-3 text-center text-gray-400 tabular-nums">{s.mp}</td>
-                  <td className="px-2 py-3 text-center text-[#009C3B] font-bold tabular-nums">{s.w}</td>
-                  <td className="px-2 py-3 text-center text-gray-400 tabular-nums">{s.d}</td>
-                  <td className="px-2 py-3 text-center text-red-500 tabular-nums">{s.l}</td>
-                  <td className="px-2 py-3 text-center text-gray-500 tabular-nums hidden sm:table-cell">{s.gf}</td>
-                  <td className="px-2 py-3 text-center text-gray-500 tabular-nums hidden sm:table-cell">{s.ga}</td>
-                  <td className="px-2 py-3 text-center"><GdCell gd={s.gd} /></td>
-                  <td className="px-2 py-3 text-center font-black text-[#002776] tabular-nums">{s.pts}</td>
-                  <td className="px-2 py-3 text-center text-gray-500 tabular-nums hidden sm:table-cell">
-                    {s.mp > 0 ? `${((s.w + s.d / 2) / s.mp * 100).toFixed(2)}%` : '—'}
+                  <td className="px-1 sm:px-2 py-3 text-center text-gray-400 tabular-nums">{s.mp}</td>
+                  <td className="px-1 sm:px-2 py-3 text-center text-[#009C3B] font-bold tabular-nums">{s.w}</td>
+                  <td className="px-1 sm:px-2 py-3 text-center text-gray-400 tabular-nums">{s.d}</td>
+                  <td className="px-1 sm:px-2 py-3 text-center text-red-500 tabular-nums">{s.l}</td>
+                  <td className="px-1 sm:px-2 py-3 text-center text-gray-500 tabular-nums hidden sm:table-cell">{s.gf}</td>
+                  <td className="px-1 sm:px-2 py-3 text-center text-gray-500 tabular-nums hidden sm:table-cell">{s.ga}</td>
+                  <td className="px-1 sm:px-2 py-3 text-center hidden sm:table-cell"><GdCell gd={s.gd} /></td>
+                  <td className="px-1 sm:px-2 py-3 text-center font-black text-[#002776] tabular-nums">{s.pts}</td>
+                  <td className="px-1 sm:px-2 py-3 text-center text-gray-500 tabular-nums">
+                    {s.mp > 0 ? `${((s.w + s.d / 2) / s.mp * 100).toFixed(1)}%` : '—'}
                   </td>
-                  <td className="px-3 py-3 text-right">
+                  <td className="px-1.5 sm:px-3 py-3 text-right">
                     {proj && projRank.has(s.team)
                       ? <ProjCell rank={projRank.get(s.team)!} proj={proj} n={n} />
                       : <span className="text-gray-300">—</span>}
