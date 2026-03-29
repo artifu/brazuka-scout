@@ -254,10 +254,13 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
   if (teamId) gpQuery = gpQuery.eq('team_id', teamId)
 
   // Fetch appearances (covers goalkeepers + players with few goals)
-  const appsQuery = supabase
+  // Join games so we can filter by team_id — prevents cross-team inflation
+  let appsQuery = supabase
     .from('appearances')
-    .select('player_id, player, game_id')
+    .select('player_id, player, game_id, games!inner(team_id, season_id)')
     .limit(5000)
+  if (teamId) appsQuery = appsQuery.eq('games.team_id', teamId)
+  else if (seasonId) appsQuery = appsQuery.eq('games.season_id', seasonId)
 
   // Display name overrides (e.g. "Mazza" for Marcelo Mazzafera)
   const displayNamesQuery = supabase
