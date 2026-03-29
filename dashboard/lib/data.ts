@@ -254,13 +254,15 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
   if (teamId) gpQuery = gpQuery.eq('team_id', teamId)
 
   // Fetch appearances (covers goalkeepers + players with few goals)
-  // Join games so we can filter by team_id — prevents cross-team inflation
-  let appsQuery = supabase
+  const appsQuery = supabase
     .from('appearances')
-    .select('player_id, player, game_id, games!inner(team_id, season_id)')
+    .select('player_id, player, game_id')
     .limit(5000)
-  if (teamId) appsQuery = appsQuery.eq('games.team_id', teamId)
-  else if (seasonId) appsQuery = appsQuery.eq('games.season_id', seasonId)
+
+  // Fetch game IDs for this team so we can filter cross-team appearances
+  let teamGamesQuery = supabase.from('games').select('id')
+  if (teamId) teamGamesQuery = teamGamesQuery.eq('team_id', teamId)
+  else if (seasonId) teamGamesQuery = teamGamesQuery.eq('season_id', seasonId)
 
   // Display name overrides (e.g. "Mazza" for Marcelo Mazzafera)
   const displayNamesQuery = supabase
@@ -268,9 +270,11 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     .select('id, display_name')
     .not('display_name', 'is', null)
 
-  const [{ data: goalsData }, { data: assistsData }, { data: gpData }, { data: appsData }, { data: displayNamesData }] = await Promise.all([
-    goalsQuery, assistsQuery, gpQuery, appsQuery, displayNamesQuery,
+  const [{ data: goalsData }, { data: assistsData }, { data: gpData }, { data: appsData }, { data: teamGamesData }, { data: displayNamesData }] = await Promise.all([
+    goalsQuery, assistsQuery, gpQuery, appsQuery, teamGamesQuery, displayNamesQuery,
   ])
+
+  const teamGameIds = new Set((teamGamesData ?? []).map(g => g.id))
 
   const displayNames: Record<number, string> = {}
   for (const row of displayNamesData ?? []) {
@@ -296,9 +300,11 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
   }
 
   // Merge game_players + appearances for confirmed GP (covers goalkeepers)
+  // Filter appearances to this team's game IDs to prevent cross-team inflation
   const confirmedGP: Record<string, Set<number>> = {}
   for (const row of [...(gpData ?? []), ...(appsData ?? [])]) {
     if (!row.player_id) continue
+    if (teamGameIds.size > 0 && row.game_id && !teamGameIds.has(row.game_id)) continue
     const k = key(row.player_id, row.player)
     if (!confirmedGP[k]) confirmedGP[k] = new Set()
     confirmedGP[k].add(row.game_id)
