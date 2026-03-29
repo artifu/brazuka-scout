@@ -101,8 +101,13 @@ def extract_names_from_list(text: str) -> list[str]:
     for line in text.splitlines():
         m = re.match(r'^\d+[\.\)]\s*(.+)', line.strip())
         if m:
+            raw = m.group(1).strip()
+            # Strip WhatsApp @mention formatting: @⁨Name⁩ → Name
+            raw = re.sub(r'@[⁨~]*(.*?)[⁩]', r'\1', raw).strip()
+            # Strip zero-width / non-printable chars that WhatsApp injects
+            raw = re.sub(r'[\u2060\u200b\u200c\u200d\uFEFF\u2063]', '', raw).strip()
             # Strip trailing modifiers like "(L)", "+1", "✅", "❓"
-            raw = re.sub(r'\s*[\(\+✅❓🤔].*$', '', m.group(1)).strip().lower()
+            raw = re.sub(r'\s*[\(\+✅❓🤔].*$', '', raw).strip().lower()
             if raw:
                 names.append(raw)
     return names
