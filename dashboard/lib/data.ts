@@ -300,11 +300,9 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
   }
 
   // Merge game_players + appearances for confirmed GP (covers goalkeepers)
-  // Filter appearances to this team's game IDs to prevent cross-team inflation
   const confirmedGP: Record<string, Set<number>> = {}
   for (const row of [...(gpData ?? []), ...(appsData ?? [])]) {
     if (!row.player_id) continue
-    if (teamGameIds.size > 0 && row.game_id && !teamGameIds.has(row.game_id)) continue
     const k = key(row.player_id, row.player)
     if (!confirmedGP[k]) confirmedGP[k] = new Set()
     confirmedGP[k].add(row.game_id)
@@ -312,13 +310,19 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
 
   return Object.entries(totals)
     .map(([k, { name, playerId, goals, assists, gameSet }]) => {
-      // Union of confirmed roster entries + games inferred from scoring/assisting
       const confirmedSet = confirmedGP[k] ?? new Set<number>()
-      const allGames = new Set([...confirmedSet, ...gameSet])
+      // Union of all sources, then filter to this team's games to prevent cross-team inflation
+      const rawAllGames = new Set([...confirmedSet, ...gameSet])
+      const allGames = teamGameIds.size > 0
+        ? new Set([...rawAllGames].filter(id => teamGameIds.has(id)))
+        : rawAllGames
       const contributions = goals + assists
-      // If no games can be linked but player has contributions, infer at least 1 game
       const gamesPlayed = allGames.size > 0 ? allGames.size : contributions > 0 ? 1 : null
-      const gpInferred = gameSet.size > confirmedSet.size || (allGames.size === 0 && contributions > 0)
+      // gpInferred: true when game count relies on scoring inference rather than confirmed roster
+      const confirmedTeamGames = teamGameIds.size > 0
+        ? new Set([...confirmedSet].filter(id => teamGameIds.has(id)))
+        : confirmedSet
+      const gpInferred = gameSet.size > confirmedTeamGames.size || (allGames.size === 0 && contributions > 0)
       const displayName = playerId != null && displayNames[playerId] ? displayNames[playerId] : name
       return {
         player: displayName, playerId, goals, assists, gamesPlayed,
