@@ -288,9 +288,22 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     Object.values(totals).map(e => e.playerId).filter((id): id is number => id != null)
   )]
 
-  const { data: appsData } = knownPlayerIds.length > 0
-    ? await supabase.from('appearances').select('player_id, game_id').in('player_id', knownPlayerIds).limit(5000)
-    : { data: [] }
+  // Supabase anon key caps at 1000 rows per request — paginate to get all appearances
+  const appsData: { player_id: number; game_id: number }[] = []
+  if (knownPlayerIds.length > 0) {
+    let offset = 0
+    const PAGE = 1000
+    while (true) {
+      const { data } = await supabase.from('appearances')
+        .select('player_id, game_id')
+        .in('player_id', knownPlayerIds)
+        .range(offset, offset + PAGE - 1)
+      if (!data || data.length === 0) break
+      appsData.push(...data)
+      if (data.length < PAGE) break
+      offset += PAGE
+    }
+  }
 
   // MP per player = appearances intersected with this team's game IDs
   const playerMP = new Map<number, Set<number>>()
