@@ -301,20 +301,23 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     if (row.game_id) totals[k].gameSet.add(row.game_id)  // infer participation
   }
 
-  // Build per-player confirmed team game count (mirrors getPlayerProfile logic exactly)
-  // Keyed by player_id (integer), filtered to teamGameIds inline to avoid cross-team inflation
-  const playerTeamGames = new Map<number, Set<number>>()
+  // Build per-player appearance game_id set (all teams — mirrors getPlayerProfile's appRows)
+  // We intersect with teamGameIds later, exactly as profile does: withGames = allGames.filter(g => withIds.has(g.id))
+  const playerAllAppGames = new Map<number, Set<number>>()
   for (const row of [...(gpData ?? []), ...(appsData ?? [])]) {
     if (!row.player_id) continue
-    if (teamGameIds.size > 0 && !teamGameIds.has(row.game_id)) continue
-    if (!playerTeamGames.has(row.player_id)) playerTeamGames.set(row.player_id, new Set())
-    playerTeamGames.get(row.player_id)!.add(row.game_id)
+    if (!playerAllAppGames.has(row.player_id)) playerAllAppGames.set(row.player_id, new Set())
+    playerAllAppGames.get(row.player_id)!.add(row.game_id)
   }
 
   return Object.entries(totals)
     .map(([k, { name, playerId, goals, assists, gameSet }]) => {
       const contributions = goals + assists
-      const teamGames = playerId != null ? (playerTeamGames.get(playerId) ?? new Set<number>()) : new Set<number>()
+      const allAppGames = playerId != null ? (playerAllAppGames.get(playerId) ?? new Set<number>()) : new Set<number>()
+      // Intersect with team games — same as profile: withGames = allGames.filter(g => withIds.has(g.id))
+      const teamGames = teamGameIds.size > 0
+        ? new Set([...teamGameIds].filter(id => allAppGames.has(id)))
+        : allAppGames
       const gamesPlayed = teamGames.size > 0 ? teamGames.size : contributions > 0 ? 1 : null
       const gpInferred = teamGames.size === 0 && contributions > 0
       const displayName = playerId != null && displayNames[playerId] ? displayNames[playerId] : name
