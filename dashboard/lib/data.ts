@@ -246,11 +246,6 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
   if (seasonId) assistsQuery = assistsQuery.eq('season_id', seasonId)
   else if (teamId) assistsQuery = assistsQuery.eq('team_id', teamId)
 
-  // appearances has no FK in Supabase schema — cannot use !inner join (silently returns wrong rows)
-  // Exact same approach as getPlayerProfile: fetch all appearances unfiltered, fetch team games
-  // separately, intersect in JS. Number() cast prevents string/int type mismatch.
-  const appsQuery = supabase.from('appearances').select('player_id, game_id').limit(10000)
-
   let teamGamesQuery = supabase.from('games').select('id').limit(5000)
   if (seasonId) teamGamesQuery = teamGamesQuery.eq('season_id', seasonId)
   else if (teamId) teamGamesQuery = teamGamesQuery.eq('team_id', teamId)
@@ -261,11 +256,10 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     .select('id, display_name')
     .not('display_name', 'is', null)
 
-  const [{ data: goalsData }, { data: assistsData }, { data: appsData }, { data: teamGamesData }, { data: displayNamesData }] = await Promise.all([
-    goalsQuery, assistsQuery, appsQuery, teamGamesQuery, displayNamesQuery,
+  const [{ data: goalsData }, { data: assistsData }, { data: teamGamesData }, { data: displayNamesData }] = await Promise.all([
+    goalsQuery, assistsQuery, teamGamesQuery, displayNamesQuery,
   ])
 
-  // Team game ID set — authoritative filter (profile uses allGames.filter(g => withIds.has(g.id)))
   const teamGameIdSet = new Set<number>((teamGamesData ?? []).map(g => Number(g.id)))
 
   const displayNames: Record<number, string> = {}
@@ -289,7 +283,16 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     totals[k].assists += row.count
   }
 
-  // MP per player = distinct appearances game_ids that are in this team's games
+  // Fetch appearances only for the player_ids we know about — keeps query small (avoids 1000-row page limit)
+  const knownPlayerIds = [...new Set(
+    Object.values(totals).map(e => e.playerId).filter((id): id is number => id != null)
+  )]
+
+  const { data: appsData } = knownPlayerIds.length > 0
+    ? await supabase.from('appearances').select('player_id, game_id').in('player_id', knownPlayerIds).limit(5000)
+    : { data: [] }
+
+  // MP per player = appearances intersected with this team's game IDs
   const playerMP = new Map<number, Set<number>>()
   for (const row of appsData ?? []) {
     if (!row.player_id || !row.game_id) continue
