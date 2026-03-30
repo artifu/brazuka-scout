@@ -301,28 +301,22 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     if (row.game_id) totals[k].gameSet.add(row.game_id)  // infer participation
   }
 
-  // Merge game_players + appearances for confirmed GP (covers goalkeepers)
-  const confirmedGP: Record<string, Set<number>> = {}
+  // Build per-player confirmed team game count (mirrors getPlayerProfile logic exactly)
+  // Keyed by player_id (integer), filtered to teamGameIds inline to avoid cross-team inflation
+  const playerTeamGames = new Map<number, Set<number>>()
   for (const row of [...(gpData ?? []), ...(appsData ?? [])]) {
     if (!row.player_id) continue
-    const k = key(row.player_id, row.player)
-    if (!confirmedGP[k]) confirmedGP[k] = new Set()
-    confirmedGP[k].add(row.game_id)
+    if (teamGameIds.size > 0 && !teamGameIds.has(row.game_id)) continue
+    if (!playerTeamGames.has(row.player_id)) playerTeamGames.set(row.player_id, new Set())
+    playerTeamGames.get(row.player_id)!.add(row.game_id)
   }
 
   return Object.entries(totals)
     .map(([k, { name, playerId, goals, assists, gameSet }]) => {
-      const confirmedSet = confirmedGP[k] ?? new Set<number>()
       const contributions = goals + assists
-      // Mirror getPlayerProfile logic: confirmed appearances filtered to this team's games
-      const confirmedTeamGames = teamGameIds.size > 0
-        ? new Set([...confirmedSet].filter(id => teamGameIds.has(id)))
-        : confirmedSet
-      // Fall back to scoring inference only when no confirmed roster data exists
-      const gamesPlayed = confirmedTeamGames.size > 0
-        ? confirmedTeamGames.size
-        : gameSet.size > 0 ? gameSet.size : contributions > 0 ? 1 : null
-      const gpInferred = confirmedTeamGames.size === 0 && contributions > 0
+      const teamGames = playerId != null ? (playerTeamGames.get(playerId) ?? new Set<number>()) : new Set<number>()
+      const gamesPlayed = teamGames.size > 0 ? teamGames.size : contributions > 0 ? 1 : null
+      const gpInferred = teamGames.size === 0 && contributions > 0
       const displayName = playerId != null && displayNames[playerId] ? displayNames[playerId] : name
       return {
         player: displayName, playerId, goals, assists, gamesPlayed,
