@@ -313,18 +313,16 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
   return Object.entries(totals)
     .map(([k, { name, playerId, goals, assists, gameSet }]) => {
       const confirmedSet = confirmedGP[k] ?? new Set<number>()
-      // Union of all sources, then filter to this team's games to prevent cross-team inflation
-      const rawAllGames = new Set([...confirmedSet, ...gameSet])
-      const allGames = teamGameIds.size > 0
-        ? new Set([...rawAllGames].filter(id => teamGameIds.has(id)))
-        : rawAllGames
       const contributions = goals + assists
-      const gamesPlayed = allGames.size > 0 ? allGames.size : contributions > 0 ? 1 : null
-      // gpInferred: true when game count relies on scoring inference rather than confirmed roster
+      // Mirror getPlayerProfile logic: confirmed appearances filtered to this team's games
       const confirmedTeamGames = teamGameIds.size > 0
         ? new Set([...confirmedSet].filter(id => teamGameIds.has(id)))
         : confirmedSet
-      const gpInferred = gameSet.size > confirmedTeamGames.size || (allGames.size === 0 && contributions > 0)
+      // Fall back to scoring inference only when no confirmed roster data exists
+      const gamesPlayed = confirmedTeamGames.size > 0
+        ? confirmedTeamGames.size
+        : gameSet.size > 0 ? gameSet.size : contributions > 0 ? 1 : null
+      const gpInferred = confirmedTeamGames.size === 0 && contributions > 0
       const displayName = playerId != null && displayNames[playerId] ? displayNames[playerId] : name
       return {
         player: displayName, playerId, goals, assists, gamesPlayed,
