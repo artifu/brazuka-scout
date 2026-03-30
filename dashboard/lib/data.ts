@@ -246,18 +246,14 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
   if (seasonId) assistsQuery = assistsQuery.eq('season_id', seasonId)
   else if (teamId) assistsQuery = assistsQuery.eq('team_id', teamId)
 
-  // Fetch confirmed games played from game_players table
-  let gpQuery = supabase
-    .from('game_players')
-    .select('player_id, player, game_id')
-    .limit(5000)
-  if (teamId) gpQuery = gpQuery.eq('team_id', teamId)
-
-  // Fetch appearances (covers goalkeepers + players with few goals)
-  const appsQuery = supabase
+  // Fetch confirmed games played — appearances joined to games to filter by team/season
+  // Same pattern as goalsQuery (games!inner join). This eliminates cross-team appearances at DB level.
+  let appsQuery = supabase
     .from('appearances')
-    .select('player_id, player, game_id')
+    .select('player_id, game_id, games!inner(team_id, season_id)')
     .limit(5000)
+  if (seasonId) appsQuery = appsQuery.eq('games.season_id', seasonId)
+  else if (teamId) appsQuery = appsQuery.eq('games.team_id', teamId)
 
   // Display name overrides (e.g. "Mazza" for Marcelo Mazzafera)
   const displayNamesQuery = supabase
@@ -265,61 +261,45 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     .select('id, display_name')
     .not('display_name', 'is', null)
 
-  // Fetch game IDs for this team/season — source of truth for filtering cross-team appearances
-  let teamGamesQuery = supabase.from('games').select('id').limit(5000)
-  if (seasonId) teamGamesQuery = teamGamesQuery.eq('season_id', seasonId)
-  else if (teamId) teamGamesQuery = teamGamesQuery.eq('team_id', teamId)
-
-  const [{ data: goalsData }, { data: assistsData }, { data: gpData }, { data: appsData }, { data: displayNamesData }, { data: teamGamesData }] = await Promise.all([
-    goalsQuery, assistsQuery, gpQuery, appsQuery, displayNamesQuery, teamGamesQuery,
+  const [{ data: goalsData }, { data: assistsData }, { data: appsData }, { data: displayNamesData }] = await Promise.all([
+    goalsQuery, assistsQuery, appsQuery, displayNamesQuery,
   ])
-
-  // Build team-scoped game ID set from the games table (authoritative source)
-  // Used to filter appearances which span all teams (appearances has no team_id)
-  const teamGameIds = new Set<number>((teamGamesData ?? []).map(g => g.id))
 
   const displayNames: Record<number, string> = {}
   for (const row of displayNamesData ?? []) {
     if (row.display_name) displayNames[row.id] = row.display_name
   }
 
-  type PlayerEntry = { name: string; playerId: number | null; goals: number; assists: number; gameSet: Set<number> }
+  type PlayerEntry = { name: string; playerId: number | null; goals: number; assists: number }
   const totals: Record<string, PlayerEntry> = {}
   const key = (id: number | null, name: string) => id != null ? `id:${id}` : `name:${name}`
 
   for (const row of goalsData ?? []) {
     const k = key(row.player_id, row.player)
-    if (!totals[k]) totals[k] = { name: row.player, playerId: row.player_id ?? null, goals: 0, assists: 0, gameSet: new Set() }
+    if (!totals[k]) totals[k] = { name: row.player, playerId: row.player_id ?? null, goals: 0, assists: 0 }
     totals[k].goals += row.count
-    if (row.game_id) totals[k].gameSet.add(row.game_id)  // infer participation
   }
 
   for (const row of assistsData ?? []) {
     const k = key(row.player_id, row.player)
-    if (!totals[k]) totals[k] = { name: row.player, playerId: row.player_id ?? null, goals: 0, assists: 0, gameSet: new Set() }
+    if (!totals[k]) totals[k] = { name: row.player, playerId: row.player_id ?? null, goals: 0, assists: 0 }
     totals[k].assists += row.count
-    if (row.game_id) totals[k].gameSet.add(row.game_id)  // infer participation
   }
 
-  // Build per-player appearance game_id set (all teams — mirrors getPlayerProfile's appRows)
-  // We intersect with teamGameIds later, exactly as profile does: withGames = allGames.filter(g => withIds.has(g.id))
-  const playerAllAppGames = new Map<number, Set<number>>()
-  for (const row of [...(gpData ?? []), ...(appsData ?? [])]) {
+  // MP = distinct team-scoped game_ids from appearances (already filtered to team by join above)
+  const playerMP = new Map<number, Set<number>>()
+  for (const row of appsData ?? []) {
     if (!row.player_id) continue
-    if (!playerAllAppGames.has(row.player_id)) playerAllAppGames.set(row.player_id, new Set())
-    playerAllAppGames.get(row.player_id)!.add(row.game_id)
+    if (!playerMP.has(row.player_id)) playerMP.set(row.player_id, new Set())
+    playerMP.get(row.player_id)!.add(row.game_id)
   }
 
   return Object.entries(totals)
-    .map(([k, { name, playerId, goals, assists, gameSet }]) => {
+    .map(([, { name, playerId, goals, assists }]) => {
       const contributions = goals + assists
-      const allAppGames = playerId != null ? (playerAllAppGames.get(playerId) ?? new Set<number>()) : new Set<number>()
-      // Intersect with team games — same as profile: withGames = allGames.filter(g => withIds.has(g.id))
-      const teamGames = teamGameIds.size > 0
-        ? new Set([...teamGameIds].filter(id => allAppGames.has(id)))
-        : allAppGames
-      const gamesPlayed = teamGames.size > 0 ? teamGames.size : contributions > 0 ? 1 : null
-      const gpInferred = teamGames.size === 0 && contributions > 0
+      const mp = playerId != null ? (playerMP.get(playerId)?.size ?? 0) : 0
+      const gamesPlayed = mp > 0 ? mp : null
+      const gpInferred = false
       const displayName = playerId != null && displayNames[playerId] ? displayNames[playerId] : name
       return {
         player: displayName, playerId, goals, assists, gamesPlayed,
