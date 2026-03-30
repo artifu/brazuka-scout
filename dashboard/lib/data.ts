@@ -259,22 +259,24 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     .select('player_id, player, game_id')
     .limit(5000)
 
-  // Fetch game IDs for this team so we can filter cross-team appearances
-  let teamGamesQuery = supabase.from('games').select('id')
-  if (teamId) teamGamesQuery = teamGamesQuery.eq('team_id', teamId)
-  else if (seasonId) teamGamesQuery = teamGamesQuery.eq('season_id', seasonId)
-
   // Display name overrides (e.g. "Mazza" for Marcelo Mazzafera)
   const displayNamesQuery = supabase
     .from('players')
     .select('id, display_name')
     .not('display_name', 'is', null)
 
-  const [{ data: goalsData }, { data: assistsData }, { data: gpData }, { data: appsData }, { data: teamGamesData }, { data: displayNamesData }] = await Promise.all([
-    goalsQuery, assistsQuery, gpQuery, appsQuery, teamGamesQuery, displayNamesQuery,
+  // Fetch game IDs for this team/season — source of truth for filtering cross-team appearances
+  let teamGamesQuery = supabase.from('games').select('id').limit(5000)
+  if (seasonId) teamGamesQuery = teamGamesQuery.eq('season_id', seasonId)
+  else if (teamId) teamGamesQuery = teamGamesQuery.eq('team_id', teamId)
+
+  const [{ data: goalsData }, { data: assistsData }, { data: gpData }, { data: appsData }, { data: displayNamesData }, { data: teamGamesData }] = await Promise.all([
+    goalsQuery, assistsQuery, gpQuery, appsQuery, displayNamesQuery, teamGamesQuery,
   ])
 
-  const teamGameIds = new Set((teamGamesData ?? []).map(g => g.id))
+  // Build team-scoped game ID set from the games table (authoritative source)
+  // Used to filter appearances which span all teams (appearances has no team_id)
+  const teamGameIds = new Set<number>((teamGamesData ?? []).map(g => g.id))
 
   const displayNames: Record<number, string> = {}
   for (const row of displayNamesData ?? []) {
