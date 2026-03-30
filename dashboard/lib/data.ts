@@ -246,14 +246,14 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
   if (seasonId) assistsQuery = assistsQuery.eq('season_id', seasonId)
   else if (teamId) assistsQuery = assistsQuery.eq('team_id', teamId)
 
-  // Fetch confirmed games played — appearances joined to games to filter by team/season
-  // Same pattern as goalsQuery (games!inner join). This eliminates cross-team appearances at DB level.
-  let appsQuery = supabase
-    .from('appearances')
-    .select('player_id, game_id, games!inner(team_id, season_id)')
-    .limit(5000)
-  if (seasonId) appsQuery = appsQuery.eq('games.season_id', seasonId)
-  else if (teamId) appsQuery = appsQuery.eq('games.team_id', teamId)
+  // appearances has no FK in Supabase schema — cannot use !inner join (silently returns wrong rows)
+  // Exact same approach as getPlayerProfile: fetch all appearances unfiltered, fetch team games
+  // separately, intersect in JS. Number() cast prevents string/int type mismatch.
+  const appsQuery = supabase.from('appearances').select('player_id, game_id').limit(10000)
+
+  let teamGamesQuery = supabase.from('games').select('id').limit(5000)
+  if (seasonId) teamGamesQuery = teamGamesQuery.eq('season_id', seasonId)
+  else if (teamId) teamGamesQuery = teamGamesQuery.eq('team_id', teamId)
 
   // Display name overrides (e.g. "Mazza" for Marcelo Mazzafera)
   const displayNamesQuery = supabase
@@ -261,9 +261,12 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     .select('id, display_name')
     .not('display_name', 'is', null)
 
-  const [{ data: goalsData }, { data: assistsData }, { data: appsData }, { data: displayNamesData }] = await Promise.all([
-    goalsQuery, assistsQuery, appsQuery, displayNamesQuery,
+  const [{ data: goalsData }, { data: assistsData }, { data: appsData }, { data: teamGamesData }, { data: displayNamesData }] = await Promise.all([
+    goalsQuery, assistsQuery, appsQuery, teamGamesQuery, displayNamesQuery,
   ])
+
+  // Team game ID set — authoritative filter (profile uses allGames.filter(g => withIds.has(g.id)))
+  const teamGameIdSet = new Set<number>((teamGamesData ?? []).map(g => Number(g.id)))
 
   const displayNames: Record<number, string> = {}
   for (const row of displayNamesData ?? []) {
@@ -286,18 +289,21 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     totals[k].assists += row.count
   }
 
-  // MP = distinct team-scoped game_ids from appearances (already filtered to team by join above)
+  // MP per player = distinct appearances game_ids that are in this team's games
   const playerMP = new Map<number, Set<number>>()
   for (const row of appsData ?? []) {
-    if (!row.player_id) continue
-    if (!playerMP.has(row.player_id)) playerMP.set(row.player_id, new Set())
-    playerMP.get(row.player_id)!.add(row.game_id)
+    if (!row.player_id || !row.game_id) continue
+    const gid = Number(row.game_id)
+    if (!teamGameIdSet.has(gid)) continue
+    const pid = Number(row.player_id)
+    if (!playerMP.has(pid)) playerMP.set(pid, new Set())
+    playerMP.get(pid)!.add(gid)
   }
 
   return Object.entries(totals)
     .map(([, { name, playerId, goals, assists }]) => {
       const contributions = goals + assists
-      const mp = playerId != null ? (playerMP.get(playerId)?.size ?? 0) : 0
+      const mp = playerId != null ? (playerMP.get(Number(playerId))?.size ?? 0) : 0
       const gamesPlayed = mp > 0 ? mp : null
       const gpInferred = false
       const displayName = playerId != null && displayNames[playerId] ? displayNames[playerId] : name
