@@ -288,27 +288,25 @@ export async function getTopPlayers(seasonId?: number, teamId?: number) {
     Object.values(totals).map(e => e.playerId).filter((id): id is number => id != null)
   )]
 
-  // Fetch appearances + game_players (same union as getPlayerProfile) for known players
-  // Paginate both: Supabase anon key caps at 1000 rows per request
+  // appearances is now the single source of truth for roster data (game_players migrated in)
+  // Paginate: Supabase anon key caps at 1000 rows per request
   const roosterData: { player_id: number; game_id: number }[] = []
   if (knownPlayerIds.length > 0) {
-    for (const table of ['appearances', 'game_players'] as const) {
-      let offset = 0
-      const PAGE = 1000
-      while (true) {
-        const { data } = await supabase.from(table)
-          .select('player_id, game_id')
-          .in('player_id', knownPlayerIds)
-          .range(offset, offset + PAGE - 1)
-        if (!data || data.length === 0) break
-        roosterData.push(...data)
-        if (data.length < PAGE) break
-        offset += PAGE
-      }
+    let offset = 0
+    const PAGE = 1000
+    while (true) {
+      const { data } = await supabase.from('appearances')
+        .select('player_id, game_id')
+        .in('player_id', knownPlayerIds)
+        .range(offset, offset + PAGE - 1)
+      if (!data || data.length === 0) break
+      roosterData.push(...data)
+      if (data.length < PAGE) break
+      offset += PAGE
     }
   }
 
-  // MP per player = (appearances ∪ game_players) intersected with this team's game IDs
+  // MP per player = appearances intersected with this team's game IDs
   const playerMP = new Map<number, Set<number>>()
   for (const row of roosterData) {
     if (!row.player_id || !row.game_id) continue
@@ -534,15 +532,13 @@ export type PlayerProfile = {
 }
 
 export async function getPlayerProfile(playerId: number, teamId = 1): Promise<PlayerProfile> {
-  const [{ data: allGames }, { data: gpRows }, { data: appRows }, { data: badgeRows }] = await Promise.all([
+  const [{ data: allGames }, { data: appRows }, { data: badgeRows }] = await Promise.all([
     supabase.from('games').select('id, result, score_brazuka, score_opponent').eq('team_id', teamId).not('result', 'is', null).limit(2000),
-    supabase.from('game_players').select('game_id').eq('player_id', playerId).eq('team_id', teamId).limit(2000),
     supabase.from('appearances').select('game_id').eq('player_id', playerId).limit(2000),
     supabase.from('player_badges').select('badge_slug, game_id, notes, badges!inner(name, description, icon)').eq('player_id', playerId),
   ])
 
   const withIds = new Set<number>()
-  for (const r of gpRows  ?? []) withIds.add(r.game_id)
   for (const r of appRows ?? []) withIds.add(r.game_id)
 
   const calc = (games: typeof allGames): WithWithoutStats | null => {
