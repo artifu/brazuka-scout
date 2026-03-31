@@ -22,7 +22,7 @@ from supabase import create_client
 # Load .env from the project root (one level up from migrations/)
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://lwfbvoewpzutowasyyoz.supabase.co")
+SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
 
 sb = create_client(SUPABASE_URL, SUPABASE_KEY)
