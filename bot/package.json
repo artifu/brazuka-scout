@@ -1,0 +1,18 @@
+{
+  "name": "brazuka-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp bot for BRAZUKA & RECEBA FC stats",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "postinstall": "node patch-puppeteer.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.3",
+    "@supabase/supabase-js": "^2.49.4",
+    "dotenv": "^16.4.7",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "1.34.6"
+  }
+}

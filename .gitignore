@@ -14,3 +14,9 @@ whatif_arthur.py
 create_axel_and_arthur_credits.py
 save_*.py
 .vercel
+
+# bot runtime files
+logs/
+session/
+.wwebjs_cache/
+bot/.wwebjs_cache/
