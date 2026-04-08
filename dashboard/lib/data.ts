@@ -746,3 +746,54 @@ export async function getTopOpponents(teamId: number, seasonId?: number) {
     .sort((a, b) => b.played - a.played)
     .slice(0, 10)
 }
+
+export type FieldStat = {
+  field: string
+  played: number
+  wins: number
+  draws: number
+  losses: number
+  gf: number
+  ga: number
+  winPct: number
+}
+
+export async function getFieldStats(teamId: number): Promise<FieldStat[]> {
+  const { data } = await supabase
+    .from('games')
+    .select('field, venue, result, score_brazuka, score_opponent')
+    .eq('team_id', teamId)
+    .not('result', 'is', null)
+    .limit(2000)
+  if (!data) return []
+
+  // Normalize field names (merge historical variants)
+  function normalizeField(field: string | null, venue: string | null): string | null {
+    const raw = (field || venue || '').trim()
+    if (!raw || raw.toLowerCase() === 'forfeit') return null
+    // Strip trailing " Field" and collapse to canonical short name
+    return raw
+      .replace(/\s+Field$/i, '')
+      .replace(/^Main\s+/i, '')
+      .trim()
+  }
+
+  const map: Record<string, FieldStat> = {}
+  for (const g of data) {
+    const field = normalizeField(g.field, g.venue)
+    if (!field) continue
+    if (!map[field]) map[field] = { field, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, winPct: 0 }
+    const s = map[field]
+    s.played++
+    if (g.result === 'win') s.wins++
+    else if (g.result === 'draw') s.draws++
+    else s.losses++
+    s.gf += g.score_brazuka ?? 0
+    s.ga += g.score_opponent ?? 0
+  }
+
+  return Object.values(map)
+    .filter(s => s.played >= 5)
+    .map(s => ({ ...s, winPct: s.wins / s.played }))
+    .sort((a, b) => b.played - a.played)
+}

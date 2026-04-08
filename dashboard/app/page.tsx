@@ -1,4 +1,4 @@
-import { getGames, getTopPlayers, getOverallRecord, getSeasons, getSeasonHistory, getTopOpponents, getEloRankings, getPlayerImpact, getGoalkeeperStats, getUpcomingGames, getUpcomingRecebaGames, getHeadToHead, savePrediction, getCurrentSeasonStandings, getSeasonProjection } from '@/lib/data'
+import { getGames, getTopPlayers, getOverallRecord, getSeasons, getSeasonHistory, getTopOpponents, getEloRankings, getPlayerImpact, getGoalkeeperStats, getUpcomingGames, getUpcomingRecebaGames, getHeadToHead, savePrediction, getCurrentSeasonStandings, getSeasonProjection, getFieldStats } from '@/lib/data'
 import PlayerTable from './PlayerTable'
 import GoalkeeperTable from './GoalkeeperTable'
 import SeasonFilter from './SeasonFilter'
@@ -69,7 +69,7 @@ export default async function Home({
   const seasonId = season ? parseInt(season) : undefined
 
   const league = teamId === 2 ? 'receba' : 'brazuka'
-  const [games, players, record, seasons, seasonHistory, topOpponents, eloRankings, playerImpact, goalkeepers, upcomingGames, divisionStandings, seasonProjection] = await Promise.all([
+  const [games, players, record, seasons, seasonHistory, topOpponents, eloRankings, playerImpact, goalkeepers, upcomingGames, divisionStandings, seasonProjection, fieldStats] = await Promise.all([
     getGames(seasonId, teamId),
     getTopPlayers(seasonId, teamId),
     getOverallRecord(seasonId, teamId),
@@ -84,6 +84,7 @@ export default async function Home({
     Promise.resolve([] as Awaited<ReturnType<typeof getUpcomingGames>>),
     (!seasonId) ? getCurrentSeasonStandings(league) : Promise.resolve([] as Awaited<ReturnType<typeof getCurrentSeasonStandings>>),
     (!seasonId) ? getSeasonProjection(league) : Promise.resolve([] as Awaited<ReturnType<typeof getSeasonProjection>>),
+    getFieldStats(teamId),
   ])
 
   const gameIdx = gameParam ? Math.max(0, Math.min(parseInt(gameParam), upcomingGames.length - 1)) : 0
@@ -385,6 +386,50 @@ export default async function Home({
                             {r.rating.toFixed(0)}
                           </span>
                         </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* Field Stats */}
+        {fieldStats.length > 0 && (
+          <section>
+            <SectionLabel>Performance by Field</SectionLabel>
+            <p className="text-gray-400 text-xs mb-3">All-time results broken down by venue. Min. 5 games.</p>
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
+                    <th className="px-5 py-3 text-left">Campo</th>
+                    <th className="px-3 py-3 text-center">MP</th>
+                    <th className="px-3 py-3 text-center">W</th>
+                    <th className="px-3 py-3 text-center">D</th>
+                    <th className="px-3 py-3 text-center">L</th>
+                    <th className="px-3 py-3 text-center">Win%</th>
+                    <th className="px-3 py-3 text-center">GF</th>
+                    <th className="px-5 py-3 text-center">GA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fieldStats.map((f, i) => {
+                    const pct = Math.round(f.winPct * 100)
+                    const color = pct >= 55 ? 'text-[#009C3B]' : pct <= 40 ? 'text-red-400' : 'text-gray-700'
+                    return (
+                      <tr key={f.field} className={`${i !== fieldStats.length - 1 ? 'border-b border-gray-100' : ''} hover:bg-gray-50`}>
+                        <td className="px-5 py-3 font-medium text-gray-800">{f.field}</td>
+                        <td className="px-3 py-3 text-center text-gray-400 tabular-nums text-xs">{f.played}</td>
+                        <td className="px-3 py-3 text-center text-[#009C3B] tabular-nums text-xs font-medium">{f.wins}</td>
+                        <td className="px-3 py-3 text-center text-gray-400 tabular-nums text-xs">{f.draws}</td>
+                        <td className="px-3 py-3 text-center text-red-400 tabular-nums text-xs font-medium">{f.losses}</td>
+                        <td className="px-3 py-3 text-center tabular-nums">
+                          <span className={`font-black text-sm ${color}`}>{pct}%</span>
+                        </td>
+                        <td className="px-3 py-3 text-center text-gray-500 tabular-nums text-xs">{(f.gf / f.played).toFixed(1)}</td>
+                        <td className="px-5 py-3 text-center text-gray-500 tabular-nums text-xs">{(f.ga / f.played).toFixed(1)}</td>
                       </tr>
                     )
                   })}
