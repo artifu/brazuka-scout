@@ -71,6 +71,100 @@ for _team_id, _label, _start in BRAZUKA_SEASONS:
 BRAZUKA_TEAM_ID_SUPABASE = 1  # teams.id for 'Brazuka US'
 
 
+# ── Auto-discovery: follow copiedToTeams chain ────────────────────────────────
+
+def _date_to_season_label(start_date: str) -> str:
+    """Convert a start date to a season label, e.g. '2026-04-07' → 'Spring 2026'."""
+    from datetime import date
+    d = date.fromisoformat(start_date[:10])
+    m, y = d.month, d.year
+    if m in (4, 5):
+        name = f"Spring {y}"
+    elif m in (6, 7, 8):
+        name = f"Summer {y}"
+    elif m in (9, 10):
+        name = f"Fall {y}"
+    elif m == 11:
+        name = f"Winter I {y}"
+    else:                          # Dec or Jan-Mar
+        base = y if m == 12 else y - 1
+        name = f"Winter {base}-{str(base + 1)[-2:]}"
+    return f"Soccer, Adult {name} (MAG)"
+
+
+def discover_newer_seasons(known_ids: set[str]) -> list[tuple[str, str, str]]:
+    """
+    Follow the copiedToTeams chain from the most recent known team ID and
+    return any new (team_id, season_label, start_date) tuples not yet in the list.
+    Safe to call every run — no-ops if nothing new.
+    """
+    # Start from the most recent known season (first entry in BRAZUKA_SEASONS)
+    frontier = [BRAZUKA_SEASONS[0][0]]
+    new_entries: list[tuple[str, str, str]] = []
+
+    while frontier:
+        team_id = frontier.pop()
+        url = (
+            f"{BASE_URL}/teams/{team_id}"
+            "?cache[save]=false&include=copiedToTeams&company=arenasports"
+        )
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=15)
+            resp.raise_for_status()
+            data = resp.json()
+        except Exception:
+            break
+
+        copies = (
+            data.get("data", {})
+            .get("relationships", {})
+            .get("copiedToTeams", {})
+            .get("data", []) or []
+        )
+        included = {i["id"]: i for i in data.get("included", [])}
+
+        for ref in copies:
+            new_id = ref["id"]
+            if new_id in known_ids:
+                continue
+
+            # Get start_date for the new team
+            team_info = included.get(new_id, {}).get("attributes", {})
+            start_raw = team_info.get("start_date", "")
+            start_date = start_raw[:10] if start_raw else ""
+            if not start_date:
+                # Fetch full team data to get start_date
+                try:
+                    r2 = requests.get(
+                        f"{BASE_URL}/teams/{new_id}?company=arenasports",
+                        headers=HEADERS, timeout=15,
+                    )
+                    start_date = r2.json().get("data", {}).get("attributes", {}).get("start_date", "")[:10]
+                except Exception:
+                    start_date = ""
+
+            label = _date_to_season_label(start_date) if start_date else f"Soccer, Adult Season {new_id} (MAG)"
+            new_entries.append((new_id, label, start_date))
+            known_ids.add(new_id)
+            frontier.append(new_id)  # keep following the chain
+
+    return new_entries
+
+
+# Extend BRAZUKA_SEASONS with any newly discovered seasons at import time
+_known_ids = {tid for tid, _, _ in BRAZUKA_SEASONS}
+_discovered = discover_newer_seasons(_known_ids)
+if _discovered:
+    print(f"[auto-discover] Found {len(_discovered)} new season(s): {[d[0] for d in _discovered]}")
+    BRAZUKA_SEASONS = _discovered + BRAZUKA_SEASONS
+    # Rebuild name map with new entries
+    for _team_id, _label, _start in _discovered:
+        short = re.sub(r'^Soccer,\s+Adult\s+', '', _label)
+        short = re.sub(r'\s*\(MAG\)\s*$', '', short)
+        short = re.sub(r'\bll\b', 'II', short)
+        _SEASON_NAME_MAP[_label] = short.strip()
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def clean_opponent(name: str) -> str:
