@@ -33,6 +33,8 @@ HEADERS = {
 # ── Brazuka team IDs per season ───────────────────────────────────────────────
 # (team_id, season_label, approx_start_date)
 BRAZUKA_SEASONS = [
+    ("221537", "Soccer, Adult Spring 2026 (MAG)",       "2026-04-07"),
+    ("219258", "Soccer, Adult Winter 2025-26 (MAG)",    "2025-12-01"),
     ("215810", "Soccer, Adult Winter I 2025 (MAG)",    "2025-09-29"),
     ("214012", "Soccer, Adult Fall 2025 (MAG)",         "2025-08-11"),
     ("213250", "Soccer, Adult Summer 2025 (MAG)",       "2025-06-30"),
@@ -277,14 +279,16 @@ def get_or_create_season(sb, season_label: str, start_date: str) -> int:
 def upsert_game(sb, game: dict, season_id: int):
     """
     Insert game if not present. Returns (is_new, display_str).
-    Skips (does not overwrite) if game_date already exists.
+    Skips (does not overwrite) if game_date + opponent already exists.
+    Uses both fields to handle double-headers (two games on the same date).
     """
-    # Check for existing
+    # Check for existing by date AND opponent (handles double-headers)
     existing = (
         sb.table("games")
         .select("id,opponent,result,score_brazuka,score_opponent")
         .eq("game_date", game["game_date"])
         .eq("team_id", BRAZUKA_TEAM_ID_SUPABASE)
+        .ilike("opponent", f"%{game['opponent'].split()[0]}%")
         .execute()
     )
     if existing.data:
