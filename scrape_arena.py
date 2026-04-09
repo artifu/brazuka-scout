@@ -376,13 +376,17 @@ def upsert_game(sb, game: dict, season_id: int):
     Skips (does not overwrite) if game_date + opponent already exists.
     Uses both fields to handle double-headers (two games on the same date).
     """
-    # Check for existing by date AND opponent (handles double-headers)
+    # Check for existing by date AND opponent (handles double-headers).
+    # Use the first non-numeric, non-trivial word from the opponent name so that
+    # seed prefixes like "01 Cascade F.C." still match "Cascade F.C." in the DB.
+    opp_words = [w for w in game["opponent"].split() if not w.isdigit() and len(w) > 2]
+    keyword = opp_words[0] if opp_words else game["opponent"]
     existing = (
         sb.table("games")
         .select("id,opponent,result,score_brazuka,score_opponent")
         .eq("game_date", game["game_date"])
         .eq("team_id", BRAZUKA_TEAM_ID_SUPABASE)
-        .ilike("opponent", f"%{game['opponent'].split()[0]}%")
+        .ilike("opponent", f"%{keyword}%")
         .execute()
     )
     if existing.data:
