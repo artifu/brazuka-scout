@@ -38,6 +38,8 @@ export async function getUpcomingGames(): Promise<NextGame[]> {
     const url = `${ARENA_BASE}/teams/${BRAZUKA_ARENA_TEAM_ID}?cache[save]=false&include=events.homeTeam,events.visitingTeam,events.resource&company=arenasports`
     const res = await fetch(url, { headers: ARENA_HEADERS, next: { revalidate: 3600 } })
     if (!res.ok) return []
+    const ct = res.headers.get('content-type') ?? ''
+    if (!ct.includes('json')) return []
     const data = await res.json()
 
     const included: Record<string, { type: string; attributes: Record<string, unknown> }> = {}
@@ -83,6 +85,8 @@ export async function getUpcomingRecebaGames(): Promise<NextGame[]> {
     const url = `${ARENA_BASE}/teams/${RECEBA_ARENA_TEAM_ID}?cache[save]=false&include=events.homeTeam,events.visitingTeam,events.resource&company=arenasports`
     const res = await fetch(url, { headers: ARENA_HEADERS, next: { revalidate: 3600 } })
     if (!res.ok) return []
+    const ct = res.headers.get('content-type') ?? ''
+    if (!ct.includes('json')) return []
     const data = await res.json()
 
     const included: Record<string, { type: string; attributes: Record<string, unknown> }> = {}
