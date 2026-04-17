@@ -53,9 +53,12 @@ def get(url):
     return r.json()
 
 def clean_name(name):
-    """Strip Arena Sports division suffixes."""
+    """Strip Arena Sports division suffixes and seed-number prefixes (e.g. '08 Brazuka US')."""
+    # Remove leading seed number (e.g. "08 ", "01 ")
+    name = re.sub(r"^\d+\s+", "", name).strip()
+    # Remove trailing division/status suffixes
     name = re.sub(r"\s+(?:NP(?:GK)?\s*\d*|N\dP)\s*$", "", name, flags=re.IGNORECASE).strip()
-    name = re.sub(r"\s*\((?:Tues?\.?\s+Men'?s?\s+D\d*|Tue\s+Men'?s?\s+D\d*|M|S)\)\s*(?:\([MS]\)\s*)?$", "", name, flags=re.IGNORECASE).strip()
+    name = re.sub(r"\s*\((?:Tues?\.?\s+Men'?s?\s+(?:O40D|D\d*)|Tue\s+Men'?s?\s+D\d*|M|S)\)\s*(?:\([MS]\)\s*)?$", "", name, flags=re.IGNORECASE).strip()
     name = re.sub(r"\s*\([MS]\)\s*$", "", name, flags=re.IGNORECASE).strip()
     name = re.sub(r"\s+NP\s*\d*$", "", name, flags=re.IGNORECASE).strip()
     return name
