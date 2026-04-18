@@ -231,8 +231,9 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
   const medal = (i: number) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm" style={{ overflow: 'visible' }}>
-      <table className="w-full text-xs sm:text-sm">
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[340px] text-xs sm:text-sm">
         <thead>
           <tr className="border-b border-gray-100 text-[10px] sm:text-xs uppercase tracking-wider">
             <th className="px-2 sm:px-5 py-3 text-left w-6 sm:w-8 text-gray-400">#</th>
@@ -297,6 +298,7 @@ export default function PlayerTable({ players, teamId }: { players: Player[]; te
           })}
         </tbody>
       </table>
+      </div>
       <div className="px-5 py-2.5 bg-gray-50 text-gray-400 text-xs border-t border-gray-100 flex items-center gap-3 flex-wrap">
         <span>Click a player to see their impact stats and achievements.</span>
         <span className="text-gray-300">·</span>

@@ -66,7 +66,8 @@ export default function CurrentSeasonTable({
         {seasonName} · {n} teams · Projection based on 10 000 simulations using ELO ratings for remaining fixtures.
       </p>
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-        <table className="w-full text-xs sm:text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[480px] text-xs sm:text-sm">
           <thead>
             <tr className="border-b border-gray-100 text-[10px] text-gray-400 uppercase tracking-wider">
               <th className="px-1.5 sm:px-3 py-3 text-center w-6 sm:w-8">#</th>
@@ -113,7 +114,7 @@ export default function CurrentSeasonTable({
                   <td className="px-1 sm:px-2 py-3 text-center hidden sm:table-cell"><GdCell gd={s.gd} /></td>
                   <td className="px-1 sm:px-2 py-3 text-center font-black text-[#002776] tabular-nums">{s.pts}</td>
                   <td className="px-1 sm:px-2 py-3 text-center text-gray-500 tabular-nums">
-                    {s.mp > 0 ? `${((s.w + s.d / 2) / s.mp * 100).toFixed(1)}%` : '—'}
+                    {s.mp > 0 ? `${(s.pts / (s.mp * 3) * 100).toFixed(1)}%` : '—'}
                   </td>
                   <td className="px-1.5 sm:px-3 py-3 text-right">
                     {proj && projRank.has(s.team)
@@ -125,6 +126,7 @@ export default function CurrentSeasonTable({
             })}
           </tbody>
         </table>
+        </div>
         <div className="px-4 py-2.5 bg-gray-50 text-gray-400 text-[10px] border-t border-gray-100">
           Proj. Finish = most likely final position based on 10 000 simulations using ELO win probabilities for remaining fixtures.
         </div>

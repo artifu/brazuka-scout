@@ -163,16 +163,17 @@ export default function GoalkeeperTable({ goalkeepers }: { goalkeepers: GK[] }) 
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-visible shadow-sm">
-      <table className="w-full text-sm">
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[360px] text-sm">
         <thead>
           <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
-            <th className="px-5 py-3 text-left">Goalkeeper</th>
+            <th className="px-4 py-3 text-left">Goalkeeper</th>
             <th className="px-3 py-3 text-center" title="Matches Played">MP</th>
             <th className="px-3 py-3 text-center" title="Goals Conceded">GC</th>
-            <th className="px-3 py-3 text-center" title="Goals Conceded per Game">GC/MP</th>
+            <th className="px-3 py-3 text-center hidden sm:table-cell" title="Goals Conceded per Game">GC/MP</th>
             <th className="px-3 py-3 text-center" title="Win percentage">Win%</th>
-            <th className="px-5 py-3 text-center" title="Points rate (W=3 D=1 L=0)">Pts%</th>
+            <th className="px-4 py-3 text-center hidden sm:table-cell" title="Points rate (W=3 D=1 L=0)">Pts%</th>
           </tr>
         </thead>
         <tbody>
@@ -186,20 +187,20 @@ export default function GoalkeeperTable({ goalkeepers }: { goalkeepers: GK[] }) 
                   onClick={() => toggle(gk.id)}
                   className={`cursor-pointer hover:bg-gray-50 group transition-colors ${isExpanded ? 'bg-gray-50' : ''} ${!isExpanded && !isLast ? 'border-b border-gray-100' : ''}`}
                 >
-                  <td className={`py-3 font-medium transition-all ${isExpanded ? 'pl-[10px] pr-3 border-l-2 border-[#009C3B]' : 'px-5 border-l-2 border-transparent'}`}>
+                  <td className={`py-3 font-medium transition-all ${isExpanded ? 'pl-[10px] pr-3 border-l-2 border-[#009C3B]' : 'px-4 border-l-2 border-transparent'}`}>
                     <span className={`${isExpanded ? 'text-[#009C3B]' : 'text-gray-800'} group-hover:underline underline-offset-2 decoration-dotted decoration-gray-400`}>
                       {gk.name}
                     </span>
                   </td>
                   <td className="px-3 py-3 text-center text-gray-500 tabular-nums">{gk.mp > 0 ? gk.mp : <span className="text-gray-300">—</span>}</td>
                   <td className="px-3 py-3 text-center tabular-nums text-red-500 font-semibold">{gk.mp > 0 ? gk.gc : <span className="text-gray-300">—</span>}</td>
-                  <td className="px-3 py-3 text-center tabular-nums text-gray-600">{gk.gcPerGame != null ? gk.gcPerGame.toFixed(2) : <span className="text-gray-300">—</span>}</td>
+                  <td className="px-3 py-3 text-center tabular-nums text-gray-600 hidden sm:table-cell">{gk.gcPerGame != null ? gk.gcPerGame.toFixed(2) : <span className="text-gray-300">—</span>}</td>
                   <td className="px-3 py-3 text-center">
                     {gk.winPct != null
                       ? <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${gk.winPct >= 50 ? 'bg-[#009C3B]/10 text-[#009C3B]' : 'bg-red-50 text-red-500'}`}>{gk.winPct}%</span>
                       : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-5 py-3 text-center">
+                  <td className="px-4 py-3 text-center hidden sm:table-cell">
                     {gk.ptsRate != null
                       ? <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${gk.ptsRate >= 50 ? 'bg-[#002776]/10 text-[#002776]' : 'bg-red-50 text-red-500'}`}>{gk.ptsRate}%</span>
                       : <span className="text-gray-300">—</span>}
@@ -218,6 +219,7 @@ export default function GoalkeeperTable({ goalkeepers }: { goalkeepers: GK[] }) 
           })}
         </tbody>
       </table>
+      </div>
       <div className="px-5 py-2.5 bg-gray-50 text-gray-400 text-xs border-t border-gray-100">
         Stats based on games where GK appearance was recorded. No PK data available yet.
       </div>

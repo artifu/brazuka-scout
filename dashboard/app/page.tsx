@@ -253,15 +253,16 @@ export default async function Home({
           <section>
             <SectionLabel>Top Opponents</SectionLabel>
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[360px] text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
-                    <th className="px-5 py-3 text-left">Opponent</th>
+                    <th className="px-4 py-3 text-left">Opponent</th>
                     <th className="px-3 py-3 text-center">P</th>
                     <th className="px-3 py-3 text-center">W</th>
-                    <th className="px-3 py-3 text-center">D</th>
+                    <th className="px-3 py-3 text-center hidden sm:table-cell">D</th>
                     <th className="px-3 py-3 text-center">L</th>
-                    <th className="px-5 py-3 text-right">Record</th>
+                    <th className="px-4 py-3 text-right">Win%</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -269,14 +270,14 @@ export default async function Home({
                     const winPct = Math.round((o.wins / o.played) * 100)
                     return (
                       <tr key={o.opponent} className={`${i !== topOpponents.length - 1 ? 'border-b border-gray-100' : ''} hover:bg-gray-50`}>
-                        <td className="px-5 py-3 font-medium text-gray-800">{o.opponent}</td>
+                        <td className="px-4 py-3 font-medium text-gray-800">{o.opponent}</td>
                         <td className="px-3 py-3 text-center text-gray-500">{o.played}</td>
                         <td className="px-3 py-3 text-center text-[#009C3B] font-bold">{o.wins}</td>
-                        <td className="px-3 py-3 text-center text-gray-400">{o.draws}</td>
+                        <td className="px-3 py-3 text-center text-gray-400 hidden sm:table-cell">{o.draws}</td>
                         <td className="px-3 py-3 text-center text-red-500">{o.losses}</td>
-                        <td className="px-5 py-3 text-right">
+                        <td className="px-4 py-3 text-right">
                           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${winPct >= 50 ? 'bg-[#009C3B]/10 text-[#009C3B]' : 'bg-red-50 text-red-500'}`}>
-                            {winPct}% wins
+                            {winPct}%
                           </span>
                         </td>
                       </tr>
@@ -284,6 +285,7 @@ export default async function Home({
                   })}
                 </tbody>
               </table>
+              </div>
             </div>
           </section>
         )}
@@ -293,18 +295,19 @@ export default async function Home({
           <section>
             <SectionLabel>Season by Season</SectionLabel>
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[480px] text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
-                    <th className="px-5 py-3 text-left">Season</th>
+                    <th className="px-4 py-3 text-left">Season</th>
                     <th className="px-3 py-3 text-center">Pos</th>
                     <th className="px-3 py-3 text-center">W</th>
-                    <th className="px-3 py-3 text-center">D</th>
+                    <th className="px-3 py-3 text-center hidden sm:table-cell">D</th>
                     <th className="px-3 py-3 text-center">L</th>
-                    <th className="px-3 py-3 text-center">GD</th>
+                    <th className="px-3 py-3 text-center hidden sm:table-cell">GD</th>
                     <th className="px-3 py-3 text-center">Pts</th>
-                    <th className="px-3 py-3 text-center">Pts%</th>
-                    <th className="px-5 py-3 text-center">Win%</th>
+                    <th className="px-3 py-3 text-center hidden sm:table-cell">Pts%</th>
+                    <th className="px-4 py-3 text-center">Win%</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -316,19 +319,19 @@ export default async function Home({
                     const winPct = mp > 0 ? Math.round((s.wins / mp) * 100) : 0
                     return (
                       <tr key={i} className={`${i !== seasonHistory.length - 1 ? 'border-b border-gray-100' : ''} hover:bg-gray-50`}>
-                        <td className="px-5 py-3 font-medium text-gray-800">{s.name}</td>
+                        <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">{s.name}</td>
                         <td className="px-3 py-3 text-center text-lg leading-none">
                           <PositionBadge pos={s.league_position} total={s.total_teams} />
                         </td>
                         <td className="px-3 py-3 text-center text-[#009C3B] font-bold">{s.wins}</td>
-                        <td className="px-3 py-3 text-center text-gray-500">{s.draws}</td>
+                        <td className="px-3 py-3 text-center text-gray-500 hidden sm:table-cell">{s.draws}</td>
                         <td className="px-3 py-3 text-center text-red-500">{s.losses}</td>
-                        <td className={`px-3 py-3 text-center font-medium ${gd > 0 ? 'text-[#009C3B]' : gd < 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                        <td className={`px-3 py-3 text-center font-medium hidden sm:table-cell ${gd > 0 ? 'text-[#009C3B]' : gd < 0 ? 'text-red-500' : 'text-gray-400'}`}>
                           {gd > 0 ? `+${gd}` : gd}
                         </td>
                         <td className="px-3 py-3 text-center font-black text-[#002776]">{pts}</td>
-                        <td className="px-3 py-3 text-center tabular-nums text-gray-600">{ptsRate != null ? `${ptsRate}%` : '—'}</td>
-                        <td className="px-5 py-3 text-center">
+                        <td className="px-3 py-3 text-center tabular-nums text-gray-600 hidden sm:table-cell">{ptsRate != null ? `${ptsRate}%` : '—'}</td>
+                        <td className="px-4 py-3 text-center">
                           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${winPct >= 50 ? 'bg-[#009C3B]/10 text-[#009C3B]' : 'bg-red-50 text-red-500'}`}>
                             {winPct}%
                           </span>
@@ -338,6 +341,7 @@ export default async function Home({
                   })}
                 </tbody>
               </table>
+              </div>
             </div>
           </section>
         )}
@@ -361,13 +365,14 @@ export default async function Home({
               }
             </p>
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
-                    <th className="px-5 py-3 text-left w-8">#</th>
+                    <th className="px-4 py-3 text-left w-8">#</th>
                     <th className="px-3 py-3 text-left">Team</th>
-                    <th className="px-3 py-3 text-center">MP</th>
-                    <th className="px-5 py-3 text-right">ELO</th>
+                    <th className="px-3 py-3 text-center hidden sm:table-cell">MP</th>
+                    <th className="px-4 py-3 text-right">ELO</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -375,13 +380,13 @@ export default async function Home({
                     const isMyTeam = teamId === 2 ? r.team_name === 'Receba FC' : r.team_name === 'Brazuka US'
                     return (
                       <tr key={r.team_name} className={`${i !== eloRankings.length - 1 ? 'border-b border-gray-100' : ''} ${isMyTeam ? 'bg-[#009C3B]/5' : 'hover:bg-gray-50'}`}>
-                        <td className="px-5 py-3 text-gray-400 text-xs tabular-nums">{i + 1}</td>
+                        <td className="px-4 py-3 text-gray-400 text-xs tabular-nums">{i + 1}</td>
                         <td className="px-3 py-3 font-medium text-gray-800">
                           {r.team_name}
                           {isMyTeam && <span className="ml-2 text-[10px] font-bold text-[#009C3B] bg-[#009C3B]/10 px-1.5 py-0.5 rounded-full">{teamId === 2 ? 'FC' : 'US'}</span>}
                         </td>
-                        <td className="px-3 py-3 text-center text-gray-400 tabular-nums text-xs">{r.games_played}</td>
-                        <td className="px-5 py-3 text-right">
+                        <td className="px-3 py-3 text-center text-gray-400 tabular-nums text-xs hidden sm:table-cell">{r.games_played}</td>
+                        <td className="px-4 py-3 text-right">
                           <span className={`font-black tabular-nums ${isMyTeam ? 'text-[#009C3B]' : 'text-gray-700'}`}>
                             {r.rating.toFixed(0)}
                           </span>
@@ -391,6 +396,7 @@ export default async function Home({
                   })}
                 </tbody>
               </table>
+              </div>
             </div>
           </section>
         )}
@@ -401,17 +407,18 @@ export default async function Home({
             <SectionLabel>Performance by Field</SectionLabel>
             <p className="text-gray-400 text-xs mb-3">All-time results broken down by venue. Min. 5 games.</p>
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[360px] text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
-                    <th className="px-5 py-3 text-left">Campo</th>
+                    <th className="px-4 py-3 text-left">Campo</th>
                     <th className="px-3 py-3 text-center">MP</th>
                     <th className="px-3 py-3 text-center">W</th>
-                    <th className="px-3 py-3 text-center">D</th>
+                    <th className="px-3 py-3 text-center hidden sm:table-cell">D</th>
                     <th className="px-3 py-3 text-center">L</th>
                     <th className="px-3 py-3 text-center">Win%</th>
-                    <th className="px-3 py-3 text-center">GF</th>
-                    <th className="px-5 py-3 text-center">GA</th>
+                    <th className="px-3 py-3 text-center hidden sm:table-cell">GF/g</th>
+                    <th className="px-4 py-3 text-center hidden sm:table-cell">GA/g</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -420,21 +427,22 @@ export default async function Home({
                     const color = pct >= 55 ? 'text-[#009C3B]' : pct <= 40 ? 'text-red-400' : 'text-gray-700'
                     return (
                       <tr key={f.field} className={`${i !== fieldStats.length - 1 ? 'border-b border-gray-100' : ''} hover:bg-gray-50`}>
-                        <td className="px-5 py-3 font-medium text-gray-800">{f.field}</td>
+                        <td className="px-4 py-3 font-medium text-gray-800">{f.field}</td>
                         <td className="px-3 py-3 text-center text-gray-400 tabular-nums text-xs">{f.played}</td>
                         <td className="px-3 py-3 text-center text-[#009C3B] tabular-nums text-xs font-medium">{f.wins}</td>
-                        <td className="px-3 py-3 text-center text-gray-400 tabular-nums text-xs">{f.draws}</td>
+                        <td className="px-3 py-3 text-center text-gray-400 tabular-nums text-xs hidden sm:table-cell">{f.draws}</td>
                         <td className="px-3 py-3 text-center text-red-400 tabular-nums text-xs font-medium">{f.losses}</td>
                         <td className="px-3 py-3 text-center tabular-nums">
                           <span className={`font-black text-sm ${color}`}>{pct}%</span>
                         </td>
-                        <td className="px-3 py-3 text-center text-gray-500 tabular-nums text-xs">{(f.gf / f.played).toFixed(1)}</td>
-                        <td className="px-5 py-3 text-center text-gray-500 tabular-nums text-xs">{(f.ga / f.played).toFixed(1)}</td>
+                        <td className="px-3 py-3 text-center text-gray-500 tabular-nums text-xs hidden sm:table-cell">{(f.gf / f.played).toFixed(1)}</td>
+                        <td className="px-4 py-3 text-center text-gray-500 tabular-nums text-xs hidden sm:table-cell">{(f.ga / f.played).toFixed(1)}</td>
                       </tr>
                     )
                   })}
                 </tbody>
               </table>
+              </div>
             </div>
           </section>
         )}
