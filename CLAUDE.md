@@ -55,6 +55,19 @@ ecosystem.config.js — pm2 config (runs watchdog.js)
 - `postinstall` in package.json runs the patch automatically after `npm install`
 - watchdog.js handles residual hangs by killing and restarting after 45s
 
+### ⚠️ Supabase security rule — ALWAYS do this when creating a new table
+Every new table MUST have RLS enabled immediately after creation, or Supabase
+sends a "Table publicly accessible" security alert. Add these two lines to any
+migration that creates a table:
+
+```sql
+ALTER TABLE public.<new_table> ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public read" ON public.<new_table> FOR SELECT USING (true);
+```
+
+Then add the table to `migrations/enable_rls.sql` so the script stays up to date.
+The anon key (dashboard) gets read-only access; writes use the service key (bypasses RLS).
+
 ### Supabase schema (key tables)
 - `games`: id, game_date, opponent, opponent_id (FK→teams), home_or_away, result, score_brazuka, score_opponent, team_id, season_id
 - `goals`: id, game_id, player, player_id (FK→players), count
