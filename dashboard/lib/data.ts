@@ -45,7 +45,8 @@ export async function getUpcomingGames(): Promise<NextGame[]> {
     const included: Record<string, { type: string; attributes: Record<string, unknown> }> = {}
     for (const item of data.included ?? []) included[item.id] = item
 
-    const today = new Date().toISOString().slice(0, 10)
+    // Use PST (UTC-8) so game-day stays "upcoming" until midnight local time
+    const today = new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString().slice(0, 10)
     const evRefs: { id: string }[] = data.data?.relationships?.events?.data ?? []
 
     const upcoming: NextGame[] = []
@@ -92,7 +93,8 @@ export async function getUpcomingRecebaGames(): Promise<NextGame[]> {
     const included: Record<string, { type: string; attributes: Record<string, unknown> }> = {}
     for (const item of data.included ?? []) included[item.id] = item
 
-    const today = new Date().toISOString().slice(0, 10)
+    // Use PST (UTC-8) so game-day stays "upcoming" until midnight local time
+    const today = new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString().slice(0, 10)
     const evRefs: { id: string }[] = data.data?.relationships?.events?.data ?? []
 
     const upcoming: NextGame[] = []
