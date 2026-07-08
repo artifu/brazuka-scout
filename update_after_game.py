@@ -47,6 +47,7 @@ def clean_name(name):
 
 # ─── All Brazuka seasons ──────────────────────────────────────────────────────
 BRAZUKA_SEASONS = [
+    ("223980", "Summer 2026"),
     ("221537", "Spring 2026"),
     ("219258", "Winter 2025-26"),
     ("215810", "Winter I 2025"),
