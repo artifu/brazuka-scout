@@ -55,18 +55,18 @@ ecosystem.config.js — pm2 config (runs watchdog.js)
 - `postinstall` in package.json runs the patch automatically after `npm install`
 - watchdog.js handles residual hangs by killing and restarting after 45s
 
-### ⚠️ Supabase security rule — ALWAYS do this when creating a new table
-Every new table MUST have RLS enabled immediately after creation, or Supabase
-sends a "Table publicly accessible" security alert. Add these two lines to any
-migration that creates a table:
+### ⚠️ Supabase security rule — run enable_rls.sql after adding any table
+Every table MUST have RLS enabled, or Supabase sends a "Table publicly
+accessible" security alert. You no longer hand-maintain a per-table list:
+`migrations/enable_rls.sql` is now self-healing — it loops over every table in
+the public schema, enables RLS, and grants a read-only "public read" policy to
+all of them except the ones listed in its `sensitive` array (service-role only).
 
-```sql
-ALTER TABLE public.<new_table> ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "public read" ON public.<new_table> FOR SELECT USING (true);
-```
-
-Then add the table to `migrations/enable_rls.sql` so the script stays up to date.
-The anon key (dashboard) gets read-only access; writes use the service key (bypasses RLS).
+After creating a new table, just re-run the whole `migrations/enable_rls.sql` in
+the Supabase SQL Editor and the new table is covered automatically. Only edit
+the script if the new table must be hidden from the anon/dashboard key — in that
+case add its name to the `sensitive` array. The anon key (dashboard) gets
+read-only access; writes use the service key (bypasses RLS).
 
 ### Supabase schema (key tables)
 - `games`: id, game_date, opponent, opponent_id (FK→teams), home_or_away, result, score_brazuka, score_opponent, team_id, season_id
