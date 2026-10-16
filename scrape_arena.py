@@ -33,6 +33,7 @@ HEADERS = {
 # ── Brazuka team IDs per season ───────────────────────────────────────────────
 # (team_id, season_label, approx_start_date)
 BRAZUKA_SEASONS = [
+    ("226313", "Soccer, Adult Winter I 2026 (MAG)",     "2026-09-28"),
     ("225353", "Soccer, Adult Fall 2026 (MAG)",         "2026-08-11"),
     ("223980", "Soccer, Adult Summer 2026 (MAG)",       "2026-06-30"),
     ("221537", "Soccer, Adult Spring 2026 (MAG)",       "2026-04-07"),

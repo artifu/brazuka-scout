@@ -3,7 +3,7 @@ import { unstable_noStore as noStore } from 'next/cache'
 
 // ── Arena Sports config ────────────────────────────────────────────────────
 // Update BRAZUKA_TEAM_ID each new season (Arena Sports team ID for Brazuka US)
-const BRAZUKA_ARENA_TEAM_ID = '225353'  // Fall 2026
+const BRAZUKA_ARENA_TEAM_ID = '226313'  // Winter I 2026
 const RECEBA_ARENA_TEAM_ID = '215356'   // Fall 2025
 const ARENA_BASE = 'https://apps.daysmartrecreation.com/dash/jsonapi/api/v1'
 const ARENA_HEADERS = { 'Accept': 'application/vnd.api+json', 'User-Agent': 'Mozilla/5.0' }
