@@ -106,6 +106,7 @@ const BADGE_SHORT_LABEL: Record<string, string> = {
   glass_bones:       'Glass Bones',
   chapada:           'Chapada',
   newton:            'Badminton',
+  third_law:         '3ª Lei',
 }
 
 function BadgeShelf({ badges }: { badges: PlayerProfile['badges'] }) {

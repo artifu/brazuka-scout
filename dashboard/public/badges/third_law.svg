@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Terceira Lei de Newton — ombro deslocado na trombada (ação = reação). Badge do Pedro Dutra -->
+  <circle cx="32" cy="32" r="30" fill="#0E7490" stroke="#155E75" stroke-width="2.5"/>
+  <!-- Wall on the right (what he collided with) -->
+  <rect x="50" y="6" width="8" height="52" fill="#64748B"/>
+  <line x1="50" y1="19" x2="58" y2="19" stroke="#475569" stroke-width="1"/>
+  <line x1="50" y1="32" x2="58" y2="32" stroke="#475569" stroke-width="1"/>
+  <line x1="50" y1="45" x2="58" y2="45" stroke="#475569" stroke-width="1"/>
+  <line x1="54" y1="6" x2="54" y2="19" stroke="#475569" stroke-width="1"/>
+  <line x1="54" y1="32" x2="54" y2="45" stroke="#475569" stroke-width="1"/>
+  <!-- Impact starburst where shoulder meets wall -->
+  <g fill="#FCD34D">
+    <path d="M47,26 l3,-5 l1.5,5 l5,-2 l-3,4.5 l4.5,2.5 l-5.5,0.7 l1.7,5 l-4.3,-3.3 l-3,4 l0,-5 l-5,1 l3.7,-3.8 Z"/>
+  </g>
+  <circle cx="48.5" cy="28" r="2.2" fill="#F59E0B"/>
+  <!-- Player: head -->
+  <circle cx="27" cy="20" r="7" fill="#C4855A"/>
+  <path d="M20,19 Q27,11 34,19 Q34,14 27,13 Q20,14 20,19 Z" fill="#1F2937"/>
+  <!-- Torso (green jersey) -->
+  <path d="M19,30 Q27,27 35,30 L37,46 Q27,49 17,46 Z" fill="#16A34A"/>
+  <!-- Arm in a sling: white triangular bandage across chest -->
+  <path d="M35,30 L22,38 L36,45 Z" fill="#F1F5F9"/>
+  <path d="M35,30 L36,45" stroke="#CBD5E1" stroke-width="1"/>
+  <!-- Bent forearm resting in the sling -->
+  <rect x="21" y="35.5" width="13" height="4.5" rx="2.2" fill="#C4855A" transform="rotate(-14 27 38)"/>
+  <!-- Sling strap around neck -->
+  <path d="M34,30 Q31,20 26,22" fill="none" stroke="#E2E8F0" stroke-width="2"/>
+</svg>
