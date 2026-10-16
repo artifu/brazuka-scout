@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Presente de Grego — entregou o gol de presente pro adversário (Aleme, kick-off fatídico) -->
+  <circle cx="32" cy="32" r="30" fill="#1E3A8A" stroke="#172554" stroke-width="2.5"/>
+
+  <!-- Opponent's mini goal (right) receiving the gift -->
+  <g stroke="#CBD5E1" stroke-width="1.4" fill="none">
+    <rect x="50" y="24" width="9" height="16" rx="1"/>
+    <line x1="52.3" y1="24" x2="52.3" y2="40"/>
+    <line x1="56" y1="24" x2="56" y2="40"/>
+    <line x1="50" y1="29" x2="59" y2="29"/>
+    <line x1="50" y1="34" x2="59" y2="34"/>
+  </g>
+
+  <!-- Delivery arc (gift heading to the enemy net) -->
+  <path d="M34,26 Q44,18 50,30" fill="none" stroke="#F8FAFC" stroke-width="1.6" stroke-dasharray="2 2" stroke-linecap="round"/>
+
+  <!-- Gift box -->
+  <rect x="12" y="34" width="26" height="16" rx="2" fill="#D4A24C"/>
+  <rect x="12" y="30" width="26" height="6" rx="1.5" fill="#E0B25E"/>
+  <!-- Ribbon -->
+  <rect x="22.5" y="30" width="5" height="20" fill="#DC2626"/>
+  <rect x="12" y="31.5" width="26" height="3.2" fill="#DC2626"/>
+  <!-- Bow -->
+  <path d="M25,30 Q18,24 18,30 Q18,33 25,30" fill="#EF4444"/>
+  <path d="M25,30 Q32,24 32,30 Q32,33 25,30" fill="#EF4444"/>
+  <circle cx="25" cy="30" r="2" fill="#B91C1C"/>
+
+  <!-- Soccer ball popping out of the gift -->
+  <circle cx="25" cy="21" r="7" fill="#FFFFFF" stroke="#111827" stroke-width="1"/>
+  <path d="M25,16 l3,2.3 l-1.1,3.6 h-3.8 l-1.1,-3.6 Z" fill="#111827"/>
+  <path d="M25,21 l3.4,2.1 M25,21 l-3.4,2.1 M25,21 l0,3.9" stroke="#111827" stroke-width="0.9"/>
+
+  <!-- little sparkle to sell the 'gift' -->
+  <path d="M43,42 l1,2 l2,1 l-2,1 l-1,2 l-1,-2 l-2,-1 l2,-1 Z" fill="#FCD34D"/>
+</svg>

@@ -48,6 +48,7 @@ const BADGE_SHORT_LABEL: Record<string, string> = {
   chapada:            'Chapada',
   newton:             'Badminton',
   third_law:          '3ª Lei',
+  presente_grego:     'Presente de Grego',
 }
 
 function StatPill({ label, value, highlight }: { label: string; value: string | number; highlight?: boolean }) {
